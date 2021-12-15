@@ -36,6 +36,10 @@ else
   OFF=false
 fi
 
+if [ "${ON}" = false ] && ["${OFF}" = false ]; then
+  ON=true
+fi
+
 if [[ "${flags[*]}" =~ "help" ]]; then
   echoInfo "optional parameters" "<on|off>"
   exit 0
