@@ -67,6 +67,7 @@ fi
 
 echoInfo "script" "* Configuring Open Canary *"
 sudo /home/pi/OpenCanary/env/bin/opencanaryd --stop
+sudo systemctl stop opencanary
 
 sudo apt install -y python3-dev python3-pip python3-virtualenv python3-venv python3-scapy libssl-dev libpcap-dev
 sudo apt install -y samba # if you plan to use the smb module
@@ -131,7 +132,7 @@ echo "
         }
       }
   },
-  \"portscan.enabled\": false,
+  \"portscan.enabled\": true,
   \"portscan.ignore_localhost\": true,
   \"portscan.logfile\":\"/var/log/kern.log\",
   \"portscan.synrate\": 5,
