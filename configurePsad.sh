@@ -66,7 +66,7 @@ function ignoreIP() {
   #  10.10.1.0/24     0;                # Ignore traffic from this entire class C.
   #  192.168.10.4     3    tcp;         # Assign danger level 3 if protocol is tcp.
   #  10.10.1.0/24     3    tcp/1-1024;  # Danger level 3 for tcp port range
-  grep -q "^${1}\s\+0;" "/etc/psad/auto_dl" || (echo "${1}        ${2};" | sudo tee -a "/etc/psad/auto_dl");
+  grep -q "^${1}\s\+.*;" "/etc/psad/auto_dl" || (echo "${1}        ${2};" | sudo tee -a "/etc/psad/auto_dl");
 }
 
 echoInfo "script" "Ignoring some ips"
