@@ -56,7 +56,7 @@ sudo sed -i "s/^EMAIL_ADDRESSES\s\+.*$/EMAIL_ADDRESSES             ${reportPsadT
 sudo sed -i "s/^HOSTNAME\s\+.*$/HOSTNAME                    ${deviceHostname};/g" "/etc/psad/psad.conf"
 sudo sed -i "s/^ALERT_ALL\s\+.*$/ALERT_ALL                   N;/g" "/etc/psad/psad.conf"
 sudo sed -i "s/^EMAIL_ALERT_DANGER_LEVEL\s\+.*$/EMAIL_ALERT_DANGER_LEVEL                   2;/g" "/etc/psad/psad.conf"
-sudo sed -i "s/^PORT_RANGE_SCAN_THRESHOLD\s\+.*$/PORT_RANGE_SCAN_THRESHOLD                   2;/g" "/etc/psad/psad.conf"
+sudo sed -i "s/^PORT_RANGE_SCAN_THRESHOLD\s\+.*$/PORT_RANGE_SCAN_THRESHOLD                   1;/g" "/etc/psad/psad.conf"
 sudo sed -i "s/^mailCmd\s\+.*$/mailCmd          \/usr\/bin\/mutt\;/g" "/etc/psad/psad.conf"
 sudo sed -i "s/^sendmailCmd\s\+.*$/sendmailCmd      \/usr\/bin\/mutt\;/g" "/etc/psad/psad.conf"
 
