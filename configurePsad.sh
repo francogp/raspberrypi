@@ -59,16 +59,21 @@ sudo sed -i "s/^mailCmd\s\+.*$/mailCmd          \/usr\/bin\/mutt\;/g" "/etc/psad
 sudo sed -i "s/^sendmailCmd\s\+.*$/sendmailCmd      \/usr\/bin\/mutt\;/g" "/etc/psad/psad.conf"
 
 function ignoreIP() {
-  grep -q "^${1}\s\+0;" "/etc/psad/auto_dl" || (echo "${1}        0;" | sudo tee -a "/etc/psad/auto_dl");
-  echo "${1}"
+  # Examples:
+  #
+  #  10.111.21.23     5;                # Very bad IP.
+  #  127.0.0.1        0;                # Ignore this IP.
+  #  10.10.1.0/24     0;                # Ignore traffic from this entire class C.
+  #  192.168.10.4     3    tcp;         # Assign danger level 3 if protocol is tcp.
+  #  10.10.1.0/24     3    tcp/1-1024;  # Danger level 3 for tcp port range
+  grep -q "^${1}\s\+0;" "/etc/psad/auto_dl" || (echo "${1}        ${2};" | sudo tee -a "/etc/psad/auto_dl");
 }
+
 echoInfo "script" "Ignoring some ips"
-ignoreIP '192.168.0.120'
-ignoreIP '192.168.1.120'
-ignoreIP '8.8.4.4'
-#grep -q '^192.168.0.120\s\+0;' "/etc/psad/auto_dl" || (echo '192.168.0.120        0;' | sudo tee -a "/etc/psad/auto_dl")
-#grep -q '^192.168.1.120\s\+0;' "/etc/psad/auto_dl" || (echo '192.168.1.120        0;' | sudo tee -a "/etc/psad/auto_dl")
-#grep -q '^192.168.1.120\s\+0;' "/etc/psad/auto_dl" || (echo '192.168.1.120        0;' | sudo tee -a "/etc/psad/auto_dl")
+ignoreIP '192.168.0.120' '0'
+ignoreIP '192.168.1.120' '0'
+ignoreIP '192.168.0.255' '0    udp/137'
+ignoreIP '192.168.1.255' '0    udp/137'
 
 psad --sig-update || exit 100
 
