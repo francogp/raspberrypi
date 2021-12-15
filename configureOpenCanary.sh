@@ -148,7 +148,7 @@ echo '
 }
 ' > /etc/opencanaryd/opencanary.conf
 
-sudo mkdir /home/ubuntu/samba
+sudo mkdir -p /home/ubuntu/samba
 sudo chown ubuntu:ubuntu /home/ubuntu/samba
 sudo touch /home/ubuntu/samba/testing.txt
 
