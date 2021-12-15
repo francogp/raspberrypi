@@ -15,6 +15,8 @@ if [[ $(/usr/bin/id -u) -ne 0 ]]; then
   exit 1
 fi
 
+echoInfo "script" "* Update *"
+
 if [ -z ${configScriptName+x} ]; then
   source "${SCRIPT_DIR}/configs.sh"
 fi

@@ -16,6 +16,7 @@ if [[ $(/usr/bin/id -u) -ne 0 ]]; then
   exit 1
 fi
 
-echoInfo "OS" "Updating Psad..."
+echoInfo "script" "* Update PSAD *"
+
 sudo psad --sig-update || exit 100
 sudo psad -H || exit 100

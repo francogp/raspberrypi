@@ -16,5 +16,6 @@ if [[ $(/usr/bin/id -u) -ne 0 ]]; then
   exit 1
 fi
 
-echoInfo "OS" "Updating..."
+echoInfo "script" "* Update OS *"
+
 sudo apt -y update && sudo apt -y upgrade && sudo apt -y autoremove || exit 100

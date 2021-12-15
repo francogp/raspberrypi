@@ -21,7 +21,8 @@ if [ -z ${updateOsScriptName+x} ]; then
   source "${SCRIPT_DIR}/updateOS.sh"
 fi
 
-echoInfo "Firmware" "Updating..."
+echoInfo "script" "* Update Firmware *"
+
 sudo rpi-eeprom-update || exit 100
 sudo apt full-upgrade || exit 100
 sudo apt install rpi-eeprom || exit 100

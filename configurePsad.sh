@@ -19,6 +19,8 @@ if [ -z ${configScriptName+x} ]; then
   source "${SCRIPT_DIR}/configs.sh"
 fi
 
+echoInfo "script" "* Configuring PSAD *"
+
 if [ -z ${reportPsadTo+x} ]; then
   echoError "configs.sh" "var reportPsadTo is unset"
   exit 100
@@ -90,7 +92,6 @@ echo "
 192.168.0.120   0;
 192.168.1.120   0;
 8.8.8.8         0;
-8.8.4.4         0;
 8.8.4.4         0;
 " > "/etc/psad/auto_dl"
 

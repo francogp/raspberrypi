@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2021. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
 #
-configureIptableScriptName="configureIptable.sh"
+configureIpTableScriptName="configureIpTable.sh"
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
@@ -18,6 +18,8 @@ fi
 if [ -z ${configScriptName+x} ]; then
   source "${SCRIPT_DIR}/configs.sh"
 fi
+
+echoInfo "script" "* Configuring IpTable *"
 
 if [ -z ${updateOsScriptName+x} ]; then
   source "${SCRIPT_DIR}/updateOS.sh"

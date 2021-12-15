@@ -18,6 +18,8 @@ if [ -z ${configScriptName+x} ]; then
   source "${SCRIPT_DIR}/configs.sh"
 fi
 
+echoInfo "script" "* Configuring ALL *"
+
 if [ -z ${configureHostnameScriptName+x} ]; then
   source "${SCRIPT_DIR}/configureHostname.sh"
 fi
@@ -30,7 +32,7 @@ if [ -z ${configureMailScriptName+x} ]; then
   source "${SCRIPT_DIR}/configureMail.sh"
 fi
 
-if [ -z ${configureIptableScriptName+x} ]; then
+if [ -z ${configureIpTableScriptName+x} ]; then
   source "${SCRIPT_DIR}/configureIptable.sh"
 fi
 

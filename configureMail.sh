@@ -19,6 +19,7 @@ if [ -z ${configScriptName+x} ]; then
   source "${SCRIPT_DIR}/configs.sh"
 fi
 
+echoInfo "script" "* Configuring Mail *"
 
 if [ -z ${mailFullName+x} ]; then
   echoError "configs.sh" "var mailFullName is unset"

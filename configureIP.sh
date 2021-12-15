@@ -19,6 +19,8 @@ if [ -z ${configScriptName+x} ]; then
   source "${SCRIPT_DIR}/configs.sh"
 fi
 
+echoInfo "script" "* Configuring IP *"
+
 echoInfo "configs.sh" "variable loading"
 
 if [ -z ${useDHCP+x} ]; then
