@@ -37,7 +37,7 @@ echoInfo "OS" "Updating..."
 sudo apt -y update && sudo apt -y upgrade && sudo apt -y autoremove || exit 100
 
 echoInfo "script" "Configuring iptables"
-sudo apt install iptables || exit 100
+sudo apt install -y iptables || exit 100
 sudo iptables -D INPUT -j LOG
 sudo iptables -A INPUT -j LOG || exit 100
 sudo iptables -D FORWARD -j LOG
@@ -53,12 +53,15 @@ sudo sed -i "s/^EMAIL_ADDRESSES\s\+.*$/EMAIL_ADDRESSES             ${reportPsadT
 sudo sed -i "s/^HOSTNAME\s\+.*$/HOSTNAME                    ${deviceHostname};/g" "/etc/psad/psad.conf"
 sudo sed -i "s/^ALERT_ALL\s\+.*$/ALERT_ALL                   N;/g" "/etc/psad/psad.conf"
 sudo sed -i "s/^EMAIL_ALERT_DANGER_LEVEL\s\+.*$/EMAIL_ALERT_DANGER_LEVEL                   2;/g" "/etc/psad/psad.conf"
+sudo sed -i "s/^PORT_RANGE_SCAN_THRESHOLD\s\+.*$/PORT_RANGE_SCAN_THRESHOLD                   2;/g" "/etc/psad/psad.conf"
 sudo sed -i "s/^mailCmd\s\+.*$/mailCmd          \/usr\/bin\/mutt\;/g" "/etc/psad/psad.conf"
 sudo sed -i "s/^sendmailCmd\s\+.*$/sendmailCmd      \/usr\/bin\/mutt\;/g" "/etc/psad/psad.conf"
 
 echoInfo "script" "Ignoring IpDiff ip 120"
 grep -q '^192.168.0.120\s\+0;' "/etc/psad/auto_dl" || (echo '192.168.0.120        0;' | sudo tee -a "/etc/psad/auto_dl")
 grep -q '^192.168.1.120\s\+0;' "/etc/psad/auto_dl" || (echo '192.168.1.120        0;' | sudo tee -a "/etc/psad/auto_dl")
+
+psad --sig-update || exit 100
 
 sudo service psad restart
 sudo psad -S
