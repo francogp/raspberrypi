@@ -36,7 +36,8 @@ else
   OFF=false
 fi
 
-if [ "${ON}" = false ] && ["${OFF}" = false ]; then
+if [ "${ON}" = false ] && [ "${OFF}" = false ]; then
+  echoInfo "optional parameters" "using DEFAULT ON"
   ON=true
 fi
 
