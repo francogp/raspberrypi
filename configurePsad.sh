@@ -58,9 +58,17 @@ sudo sed -i "s/^PORT_RANGE_SCAN_THRESHOLD\s\+.*$/PORT_RANGE_SCAN_THRESHOLD      
 sudo sed -i "s/^mailCmd\s\+.*$/mailCmd          \/usr\/bin\/mutt\;/g" "/etc/psad/psad.conf"
 sudo sed -i "s/^sendmailCmd\s\+.*$/sendmailCmd      \/usr\/bin\/mutt\;/g" "/etc/psad/psad.conf"
 
-echoInfo "script" "Ignoring IpDiff ip 120"
-grep -q '^192.168.0.120\s\+0;' "/etc/psad/auto_dl" || (echo '192.168.0.120        0;' | sudo tee -a "/etc/psad/auto_dl")
-grep -q '^192.168.1.120\s\+0;' "/etc/psad/auto_dl" || (echo '192.168.1.120        0;' | sudo tee -a "/etc/psad/auto_dl")
+function ignoreIP() {
+  grep -q "^${1}\s\+0;" "/etc/psad/auto_dl" || (echo "${1}        0;" | sudo tee -a "/etc/psad/auto_dl");
+  echo "${1}"
+}
+echoInfo "script" "Ignoring some ips"
+ignoreIP '192.168.0.120'
+ignoreIP '192.168.1.120'
+ignoreIP '8.8.4.4'
+#grep -q '^192.168.0.120\s\+0;' "/etc/psad/auto_dl" || (echo '192.168.0.120        0;' | sudo tee -a "/etc/psad/auto_dl")
+#grep -q '^192.168.1.120\s\+0;' "/etc/psad/auto_dl" || (echo '192.168.1.120        0;' | sudo tee -a "/etc/psad/auto_dl")
+#grep -q '^192.168.1.120\s\+0;' "/etc/psad/auto_dl" || (echo '192.168.1.120        0;' | sudo tee -a "/etc/psad/auto_dl")
 
 psad --sig-update || exit 100
 
