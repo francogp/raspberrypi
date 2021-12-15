@@ -38,9 +38,162 @@ if [ -z ${updateOsScriptName+x} ]; then
 fi
 
 echoInfo "script" "* Configuring Open Canary *"
-sudo apt-get install python3-dev python3-pip python3-virtualenv python3-venv python3-scapy libssl-dev libpcap-dev
-sudo apt install samba # if you plan to use the smb module
+sudo apt install -y python3-dev python3-pip python3-virtualenv python3-venv python3-scapy libssl-dev libpcap-dev
+sudo apt install -y samba # if you plan to use the smb module
 virtualenv env/
 . env/bin/activate
 pip install opencanary
 pip install scapy pcapy # optional
+
+#OpenCanary is started by running:
+. env/bin/activate
+
+# shellcheck disable=SC2016
+echo '
+{
+  "device.node_id": "opencanary-pi400",
+  "ip.ignorelist": [  ],
+  "git.enabled": true,
+  "git.port" : 9418,
+  "ftp.enabled": true,
+  "ftp.port": 21,
+  "ftp.banner": "FTP server ready",
+  "http.banner": "Apache/2.2.22 (Ubuntu)",
+  "http.enabled": true,
+  "http.port": 80,
+  "http.skin": "nasLogin",
+  "httpproxy.enabled" : true,
+  "httpproxy.port": 8080,
+  "httpproxy.skin": "squid",
+  "logger": {
+      "class": "PyLogger",
+        "kwargs": {
+          "formatters": {
+            "plain": {
+              "format": "%(message)s"
+            },
+            "syslog_rfc": {
+              "format": "opencanaryd[%(process)-5s:%(thread)d]: %(name)s %(levelname)-5s %(message)s"
+            }
+          },
+          "handlers": {
+            "console": {
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout"
+          },
+          "file": {
+            "class": "logging.FileHandler",
+            "filename": "/var/tmp/opencanary.log"
+          }
+        }
+      }
+  },
+  "portscan.enabled": true,
+  "portscan.ignore_localhost": true,
+  "portscan.logfile":"/var/log/kern.log",
+  "portscan.synrate": 5,
+  "portscan.nmaposrate": 5,
+  "portscan.lorate": 3,
+  "smb.auditfile": "/var/log/samba-audit.log",
+  "smb.enabled": true,
+  "mysql.enabled": true,
+  "mysql.port": 3306,
+  "mysql.banner": "5.5.43-0ubuntu0.14.04.1",
+  "ssh.enabled": false,
+  "ssh.port": 22,
+  "ssh.version": "SSH-2.0-OpenSSH_5.1p1 Debian-4",
+  "redis.enabled": true,
+  "redis.port": 6379,
+  "rdp.enabled": true,
+  "rdp.port": 3389,
+  "sip.enabled": true,
+  "sip.port": 5060,
+  "snmp.enabled": true,
+  "snmp.port": 161,
+  "ntp.enabled": true,
+  "ntp.port": 123,
+  "tftp.enabled": true,
+  "tftp.port": 69,
+  "tcpbanner.maxnum":10,
+  "tcpbanner.enabled": false,
+  "tcpbanner_1.enabled": false,
+  "tcpbanner_1.port": 8001,
+  "tcpbanner_1.datareceivedbanner": "",
+  "tcpbanner_1.initbanner": "",
+  "tcpbanner_1.alertstring.enabled": false,
+  "tcpbanner_1.alertstring": "",
+  "tcpbanner_1.keep_alive.enabled": false,
+  "tcpbanner_1.keep_alive_secret": "",
+  "tcpbanner_1.keep_alive_probes": 11,
+  "tcpbanner_1.keep_alive_interval":300,
+  "tcpbanner_1.keep_alive_idle": 300,
+  "telnet.enabled": true,
+  "telnet.port": 23,
+  "telnet.banner": "",
+  "telnet.honeycreds": [
+    {
+      "username": "admin",
+      "password": "$pbkdf2-sha512$19000$bG1NaY3xvjdGyBlj7N37Xw$dGrmBqqWa1okTCpN3QEmeo9j5DuV2u1EuVFD8Di0GxNiM64To5O/Y66f7UASvnQr8.LCzqTm6awC8Kj/aGKvwA"
+    },
+    {
+      "username": "admin",
+      "password": "admin1"
+    }
+  ],
+  "mssql.enabled": true,
+  "mssql.version": "2012",
+  "mssql.port":1433,
+  "vnc.enabled": true,
+  "vnc.port":5000
+}
+' > /etc/opencanaryd/opencanary.conf
+
+sudo mkdir /home/ubuntu/samba
+sudo chown ubuntu:ubuntu /home/ubuntu/samba
+sudo touch /home/ubuntu/samba/testing.txt
+
+echo '
+[global]
+   workgroup = WORKGROUP
+   server string = NBDocs
+   netbios name = SRV01
+   dns proxy = no
+   log file = /var/log/samba/log.all
+   log level = 0
+   max log size = 100
+   panic action = /usr/share/samba/panic-action %d
+   #samba 4
+   server role = standalone server
+   #samba 3
+   #security = user
+   passdb backend = tdbsam
+   obey pam restrictions = yes
+   unix password sync = no
+   map to guest = bad user
+   usershare allow guests = yes
+   load printers = no
+   vfs object = full_audit
+   full_audit:prefix = %U|%I|%i|%m|%S|%L|%R|%a|%T|%D
+   full_audit:success = pread_recv pread_send
+   full_audit:failure = none
+   full_audit:facility = local7
+   full_audit:priority = notice
+[myshare]
+   comment = All the stuff!
+   path = /home/ubuntu/samba
+   guest ok = yes
+   read only = yes
+   browseable = yes
+ ' > '/etc/samba/smb.conf'
+
+grep -q '^local7.*/var/log/samba-audit.log' /etc/rsyslog.conf || (echo 'local7.* /var/log/samba-audit.log' | sudo tee -a /etc/rsyslog.conf)
+sudo touch /var/log/samba-audit.log
+sudo chown syslog:adm /var/log/samba-audit.log
+
+sudo systemctl restart rsyslog
+sudo systemctl restart syslog
+sudo smbcontrol all reload-config
+sudo systemctl restart smbd
+sudo systemctl restart nmbd
+
+opencanaryd --start

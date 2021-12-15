@@ -40,6 +40,10 @@ if [ -z ${configurePsadScriptName+x} ]; then
   source "${SCRIPT_DIR}/configurePsad.sh"
 fi
 
+if [ -z ${configureOpenCanaryScriptName+x} ]; then
+  source "${SCRIPT_DIR}/configureOpenCanary.sh"
+fi
+
 if [ -z ${updateFirmwareScriptName+x} ]; then
   source "${SCRIPT_DIR}/updateFirmware.sh"
 fi
