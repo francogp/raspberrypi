@@ -87,8 +87,6 @@ echo "
 #  192.168.10.4     3    tcp;         # Assign danger level 3 if protocol is tcp.
 #  10.10.1.0/24     3    tcp/1-1024;  # Danger level 3 for tcp port range
 
-192.168.0.0/24     0    udp/137;
-192.168.1.0/24     0    udp/137;
 192.168.0.120      0;
 192.168.1.120      0;
 8.8.8.8            0;
