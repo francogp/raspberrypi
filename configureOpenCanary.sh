@@ -33,6 +33,13 @@ else
   echoInfo "configs.sh" "reportOpenCanaryTo is set to '${reportOpenCanaryTo}'"
 fi
 
+if [ -z ${reportIpToIgnoreOpenCanaryTo+x} ]; then
+  echoError "configs.sh" "var reportIpToIgnoreOpenCanaryTo is unset"
+  exit 100
+else
+  echoInfo "configs.sh" "reportIpToIgnoreOpenCanaryTo is set to '${reportIpToIgnoreOpenCanaryTo}'"
+fi
+
 if [ -z ${mailFullName+x} ]; then
   echoError "configs.sh" "var mailFullName is unset"
   exit 100
@@ -82,7 +89,7 @@ virtualenv env/
 echo "
 {
   \"device.node_id\": \"${deviceHostname}\",
-  \"ip.ignorelist\": [  ],
+  \"ip.ignorelist\": [ ${reportIpToIgnoreOpenCanaryTo} ],
   \"git.enabled\": true,
   \"git.port\" : 9418,
   \"ftp.enabled\": true,
