@@ -34,10 +34,9 @@ if [ -z ${configureIptableScriptName+x} ]; then
   source "${SCRIPT_DIR}/configureIptable.sh"
 fi
 
-#already executed on configureIptable
-#if [ -z ${configurePsadScriptName+x} ]; then
-#  source "${SCRIPT_DIR}/configurePsad.sh"
-#fi
+if [ -z ${configurePsadScriptName+x} ]; then
+  source "${SCRIPT_DIR}/configurePsad.sh"
+fi
 
 if [ -z ${updateFirmwareScriptName+x} ]; then
   source "${SCRIPT_DIR}/updateFirmware.sh"
