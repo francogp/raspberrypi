@@ -26,13 +26,18 @@ if [ -z ${configureIPScriptName+x} ]; then
   source "${SCRIPT_DIR}/configureIP.sh"
 fi
 
-if [ -z ${configureMailScriptName+x} ]; then
-  source "${SCRIPT_DIR}/configureMail.sh"
+if [ -z ${configureIPScriptName+x} ]; then
+  source "${SCRIPT_DIR}/configureIP.sh"
 fi
 
-if [ -z ${configurePsadScriptName+x} ]; then
-  source "${SCRIPT_DIR}/configurePsad.sh"
+if [ -z ${configureIptableScriptName+x} ]; then
+  source "${SCRIPT_DIR}/configureIptable.sh"
 fi
+
+#already executed on configureIptable
+#if [ -z ${configurePsadScriptName+x} ]; then
+#  source "${SCRIPT_DIR}/configurePsad.sh"
+#fi
 
 if [ -z ${updateFirmwareScriptName+x} ]; then
   source "${SCRIPT_DIR}/updateFirmware.sh"

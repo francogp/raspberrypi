@@ -30,9 +30,11 @@ sudo ipset create blacklist -exist hash:net family inet hashsize 4096 maxelem 13
 sudo ipset create whitelist -exist hash:net family inet hashsize 4096 maxelem 131072
 sudo iptables -I INPUT 1 -m set --match-set blacklist src -j DROP
 sudo iptables -I INPUT 1 -m set --match-set whitelist src -j ACCEPT
-
-#update firewall iptable
-source "${SCRIPT_DIR}/configurePsad.sh"
+#psad rules
+sudo iptables -D INPUT -j LOG
+sudo iptables -D FORWARD -j LOG
+sudo ip6tables -D INPUT -j LOG
+sudo ip6tables -D FORWARD -j LOG
 
 #save lists
 sudo ipset save -f /etc/iptables/ipset
@@ -58,6 +60,10 @@ RemainAfterExit=yes
 ExecStart=/sbin/ipset restore -f -! /etc/iptables/ipset
 ExecStartPost=/sbin/iptables -I INPUT 1 -m set --match-set blacklist src -j DROP
 ExecStartPost=/sbin/iptables -I INPUT 1 -m set --match-set whitelist src -j ACCEPT
+ExecStartPost=/sbin/iptables -D INPUT -j LOG
+ExecStartPost=/sbin/iptables -D FORWARD -j LOG
+ExecStartPost=/sbin/ip6tables -D INPUT -j LOG
+ExecStartPost=/sbin/ip6tables -D FORWARD -j LOG
 ExecStop=/sbin/ipset save -f /etc/iptables/ipset
 ExecStop=/sbin/ipset flush
 ExecStopPost=/sbin/ipset destroy
