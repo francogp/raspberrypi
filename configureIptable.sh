@@ -32,9 +32,13 @@ sudo iptables -I INPUT 1 -m set --match-set blacklist src -j DROP
 sudo iptables -I INPUT 1 -m set --match-set whitelist src -j ACCEPT
 #psad rules
 sudo iptables -D INPUT -j LOG
+sudo iptables -A INPUT -j LOG || exit 100
 sudo iptables -D FORWARD -j LOG
+sudo iptables -A FORWARD -j LOG || exit 100
 sudo ip6tables -D INPUT -j LOG
+sudo ip6tables -A INPUT -j LOG || exit 100
 sudo ip6tables -D FORWARD -j LOG
+sudo ip6tables -A FORWARD -j LOG || exit 100
 
 #save lists
 sudo ipset save -f /etc/iptables/ipset
@@ -60,10 +64,10 @@ RemainAfterExit=yes
 ExecStart=/sbin/ipset restore -f -! /etc/iptables/ipset
 ExecStartPost=/sbin/iptables -I INPUT 1 -m set --match-set blacklist src -j DROP
 ExecStartPost=/sbin/iptables -I INPUT 1 -m set --match-set whitelist src -j ACCEPT
-ExecStartPost=/sbin/iptables -D INPUT -j LOG
-ExecStartPost=/sbin/iptables -D FORWARD -j LOG
-ExecStartPost=/sbin/ip6tables -D INPUT -j LOG
-ExecStartPost=/sbin/ip6tables -D FORWARD -j LOG
+ExecStartPost=/sbin/iptables -A INPUT -j LOG
+ExecStartPost=/sbin/iptables -A FORWARD -j LOG
+ExecStartPost=/sbin/ip6tables -A INPUT -j LOG
+ExecStartPost=/sbin/ip6tables -A FORWARD -j LOG
 ExecStop=/sbin/ipset save -f /etc/iptables/ipset
 ExecStop=/sbin/ipset flush
 ExecStopPost=/sbin/ipset destroy
