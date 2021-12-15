@@ -118,7 +118,7 @@ echo "
           \"SMTP\": {
             \"class\": \"logging.handlers.SMTPHandler\",
             \"mailhost\": [\"smtp.cevt.ar\", 587],
-            \"fromaddr\": \"${mailAddress}\",
+            \"fromaddr\": \"${mailFullName} <${mailAddress}>\",
             \"toaddrs\" : [${reportOpenCanaryTo}],
             \"subject\" : \"OpenCanary Alert\",
             \"credentials\" : [\"${mailAddress}\", \"${mailPassword}\"],
