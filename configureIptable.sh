@@ -19,6 +19,10 @@ if [ -z ${configScriptName+x} ]; then
   source "${SCRIPT_DIR}/configs.sh"
 fi
 
+if [ -z ${updateOsScriptName+x} ]; then
+  source "${SCRIPT_DIR}/updateOS.sh"
+fi
+
 sudo apt install -y curl grep ipset iptables sed zip unzip iptables-persistent iprange || exit 100
 
 #disable to prefere ufw rules

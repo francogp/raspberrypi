@@ -41,8 +41,9 @@ else
   echoInfo "configs.sh" "mailPassword is set to '******'"
 fi
 
-echoInfo "OS" "Updating..."
-sudo apt -y update && sudo apt -y upgrade && sudo apt -y autoremove || exit 100
+if [ -z ${updateOsScriptName+x} ]; then
+  source "${SCRIPT_DIR}/updateOS.sh"
+fi
 
 echoInfo "script" "installing"
 sudo rm /root/.muttrc

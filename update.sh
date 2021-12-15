@@ -19,7 +19,14 @@ if [ -z ${configScriptName+x} ]; then
   source "${SCRIPT_DIR}/configs.sh"
 fi
 
-echoInfo "OS" "Updating..."
-sudo apt -y update && sudo apt -y upgrade && sudo apt -y autoremove || exit 100
-echoInfo "OS" "Updating psad..."
-sudo psad --sig-update || exit 100
+if [ -z ${updateOsScriptName+x} ]; then
+  source "${SCRIPT_DIR}/updateOS.sh"
+fi
+
+if [ -z ${updateFirmwareScriptName+x} ]; then
+  source "${SCRIPT_DIR}/updateFirmware.sh"
+fi
+
+if [ -z ${updatePsadScriptName+x} ]; then
+  source "${SCRIPT_DIR}/updatePsad.sh"
+fi

@@ -26,8 +26,8 @@ if [ -z ${configureIPScriptName+x} ]; then
   source "${SCRIPT_DIR}/configureIP.sh"
 fi
 
-if [ -z ${configureIPScriptName+x} ]; then
-  source "${SCRIPT_DIR}/configureIP.sh"
+if [ -z ${configureMailScriptName+x} ]; then
+  source "${SCRIPT_DIR}/configureMail.sh"
 fi
 
 if [ -z ${configureIptableScriptName+x} ]; then
