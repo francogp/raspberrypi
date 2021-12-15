@@ -68,6 +68,10 @@ fi
 echoInfo "script" "* Configuring Open Canary *"
 sudo apt install -y python3-dev python3-pip python3-virtualenv python3-venv python3-scapy libssl-dev libpcap-dev
 sudo apt install -y samba # if you plan to use the smb module
+
+sudo mkdir -p /home/pi/OpenCanary
+cd /home/pi/OpenCanary || exit 100
+
 virtualenv env/
 . env/bin/activate
 pip install opencanary
@@ -235,5 +239,25 @@ sudo smbcontrol all reload-config
 sudo systemctl restart smbd
 sudo systemctl restart nmbd
 
-opencanaryd --start
 opencanaryd --restart
+
+echo "
+[Unit]
+Description=OpenCanary
+After=syslog.target
+After=network.target
+
+[Service]
+User=root
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/home/pi/OpenCanary/env/bin/opencanaryd --start
+ExecStop=/home/pi/OpenCanary/env/bin/opencanaryd --stop
+
+[Install]
+WantedBy=multi-user.target
+" > /etc/systemd/system/opencanary.service
+
+sudo systemctl enable opencanary.service
+sudo systemctl start opencanary
+sudo systemctl status opencanary
