@@ -148,9 +148,9 @@ echo '
 }
 ' > /etc/opencanaryd/opencanary.conf
 
-sudo mkdir -p /home/ubuntu/samba
-sudo chown ubuntu:ubuntu /home/ubuntu/samba
-sudo touch /home/ubuntu/samba/testing.txt
+sudo mkdir -p /home/pi/samba
+sudo chown pi:pi /home/pi/samba
+sudo touch /home/pi/samba/testing.txt
 
 echo '
 [global]
@@ -180,7 +180,7 @@ echo '
    full_audit:priority = notice
 [myshare]
    comment = All the stuff!
-   path = /home/ubuntu/samba
+   path = /home/pi/samba
    guest ok = yes
    read only = yes
    browseable = yes
@@ -188,7 +188,7 @@ echo '
 
 grep -q '^local7.*/var/log/samba-audit.log' /etc/rsyslog.conf || (echo 'local7.* /var/log/samba-audit.log' | sudo tee -a /etc/rsyslog.conf)
 sudo touch /var/log/samba-audit.log
-sudo chown syslog:adm /var/log/samba-audit.log
+sudo chown root:adm /var/log/samba-audit.log
 
 sudo systemctl restart rsyslog
 sudo systemctl restart syslog
