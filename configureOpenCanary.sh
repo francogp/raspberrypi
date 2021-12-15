@@ -254,6 +254,8 @@ ExecStop=/home/pi/OpenCanary/env/bin/opencanaryd --stop
 WantedBy=multi-user.target
 " > /etc/systemd/system/opencanary.service
 
+echoInfo "script" "* Installing Open Canary *"
+
 pip install opencanary
 pip install scapy pcapy # optional
 
