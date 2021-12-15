@@ -58,22 +58,41 @@ sudo sed -i "s/^PORT_RANGE_SCAN_THRESHOLD\s\+.*$/PORT_RANGE_SCAN_THRESHOLD      
 sudo sed -i "s/^mailCmd\s\+.*$/mailCmd          \/usr\/bin\/mutt\;/g" "/etc/psad/psad.conf"
 sudo sed -i "s/^sendmailCmd\s\+.*$/sendmailCmd      \/usr\/bin\/mutt\;/g" "/etc/psad/psad.conf"
 
-function ignoreIP() {
-  # Examples:
-  #
-  #  10.111.21.23     5;                # Very bad IP.
-  #  127.0.0.1        0;                # Ignore this IP.
-  #  10.10.1.0/24     0;                # Ignore traffic from this entire class C.
-  #  192.168.10.4     3    tcp;         # Assign danger level 3 if protocol is tcp.
-  #  10.10.1.0/24     3    tcp/1-1024;  # Danger level 3 for tcp port range
-  grep -q "^${1}\s\+.*;" "/etc/psad/auto_dl" || (echo "${1}        ${2};" | sudo tee -a "/etc/psad/auto_dl");
-}
-
 echoInfo "script" "Ignoring some ips"
-ignoreIP '192.168.0.120' '0'
-ignoreIP '192.168.1.120' '0'
-ignoreIP '192.168.0.255' '0    udp/137'
-ignoreIP '192.168.1.255' '0    udp/137'
+echo "
+#
+#############################################################################
+#
+# This file is used by psad to elevate/decrease the danger levels of IP
+# addresses (or networks in CIDR notation) so that psad does not have to
+# apply the normal signature logic.  This is useful if certain IP addresses
+# or networks are known trouble makers and should automatically be assigned
+# higher danger levels than would normally be assigned.  Also, psad can be
+# made to ignore certain IP addresses or networks if a danger level of "0" is
+# specified.  Optionally, danger levels for IPs/networks can be influenced
+# based on protocol (tcp, udp, icmp).
+#
+#############################################################################
+#
+
+#  <IP address>  <danger level>  <optional protocol>/<optional ports>;
+#
+# Examples:
+#
+#  10.111.21.23     5;                # Very bad IP.
+#  127.0.0.1        0;                # Ignore this IP.
+#  10.10.1.0/24     0;                # Ignore traffic from this entire class C.
+#  192.168.10.4     3    tcp;         # Assign danger level 3 if protocol is tcp.
+#  10.10.1.0/24     3    tcp/1-1024;  # Danger level 3 for tcp port range
+
+192.168.0.0/24  0   udp/137;
+192.168.1.0/24  0   udp/137;
+192.168.0.120   0;
+192.168.1.120   0;
+8.8.8.8         0;
+8.8.4.4         0;
+8.8.4.4         0;
+" > "/etc/psad/auto_dl"
 
 psad --sig-update || exit 100
 
