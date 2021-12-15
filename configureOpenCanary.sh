@@ -114,7 +114,7 @@ echo "
             \"subject\" : \"OpenCanary Alert\",
             \"credentials\" : [\"${mailAddress}\", \"${mailPassword}\"],
             \"secure\" : []
-          },
+          }
         }
       }
   },
@@ -177,6 +177,8 @@ echo "
   \"vnc.port\":5000
 }
 " > /etc/opencanaryd/opencanary.conf
+
+sudo chown -R root:root /etc/opencanaryd/opencanary.conf
 
 sudo mkdir -p /home/pi/samba
 sudo chown pi:pi /home/pi/samba
