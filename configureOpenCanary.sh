@@ -54,6 +54,13 @@ else
   echoInfo "configs.sh" "reportOpenCanaryTo is set to '******'"
 fi
 
+if [ -z ${deviceHostname+x} ]; then
+  echoError "configs.sh" "var deviceHostname is unset"
+  exit 100
+else
+  echoInfo "configs.sh" "var deviceHostname is set to '${deviceHostname}'"
+fi
+
 if [ -z ${updateOsScriptName+x} ]; then
   source "${SCRIPT_DIR}/updateOS.sh"
 fi
@@ -72,7 +79,7 @@ pip install scapy pcapy # optional
 # shellcheck disable=SC2016
 echo "
 {
-  \"device.node_id\": \"opencanary-pi400\",
+  \"device.node_id\": \"${deviceHostname}\",
   \"ip.ignorelist\": [  ],
   \"git.enabled\": true,
   \"git.port\" : 9418,
