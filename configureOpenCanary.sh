@@ -142,7 +142,7 @@ echo "
   \"mysql.enabled\": true,
   \"mysql.port\": 3306,
   \"mysql.banner\": \"5.5.43-0ubuntu0.14.04.1\",
-  \"ssh.enabled\": false,
+  \"ssh.enabled\": true,
   \"ssh.port\": 22,
   \"ssh.version\": \"SSH-2.0-OpenSSH_5.1p1 Debian-4\",
   \"redis.enabled\": true,

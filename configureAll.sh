@@ -36,6 +36,10 @@ if [ -z ${configureIpTableScriptName+x} ]; then
   source "${SCRIPT_DIR}/configureIptable.sh"
 fi
 
+if [ -z ${configureSSHScriptName+x} ]; then
+  source "${SCRIPT_DIR}/configureSSH.sh"
+fi
+
 if [ -z ${configurePsadScriptName+x} ]; then
   source "${SCRIPT_DIR}/configurePsad.sh"
 fi
