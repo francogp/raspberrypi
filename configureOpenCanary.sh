@@ -258,7 +258,6 @@ echoInfo "script" "* Installing Open Canary *"
 
 pip install opencanary
 pip install scapy pcapy # optional
-pip install opencanary-correlator
 
 sudo systemctl enable opencanary.service
 sudo systemctl start opencanary
