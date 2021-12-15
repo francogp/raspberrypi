@@ -26,6 +26,13 @@ else
   echoInfo "configs.sh" "reportPsadTo is set to '${reportPsadTo}'"
 fi
 
+if [ -z ${reportOpenCanaryTo+x} ]; then
+  echoError "configs.sh" "var reportOpenCanaryTo is unset"
+  exit 100
+else
+  echoInfo "configs.sh" "reportOpenCanaryTo is set to '${reportOpenCanaryTo}'"
+fi
+
 if [ -z ${mailFullName+x} ]; then
   echoError "configs.sh" "var mailFullName is unset"
   exit 100
@@ -45,13 +52,6 @@ if [ -z ${mailPassword+x} ]; then
   exit 100
 else
   echoInfo "configs.sh" "mailPassword is set to '******'"
-fi
-
-if [ -z ${reportOpenCanaryTo+x} ]; then
-  echoError "configs.sh" "var reportOpenCanaryTo is unset"
-  exit 100
-else
-  echoInfo "configs.sh" "reportOpenCanaryTo is set to '******'"
 fi
 
 if [ -z ${deviceHostname+x} ]; then
@@ -76,11 +76,6 @@ sudo mkdir -p /home/pi/OpenCanary
 cd /home/pi/OpenCanary || exit 100
 
 virtualenv env/
-. env/bin/activate
-pip install opencanary
-pip install scapy pcapy # optional
-
-#OpenCanary is started by running:
 . env/bin/activate
 
 # shellcheck disable=SC2016
@@ -258,6 +253,9 @@ ExecStop=/home/pi/OpenCanary/env/bin/opencanaryd --stop
 [Install]
 WantedBy=multi-user.target
 " > /etc/systemd/system/opencanary.service
+
+pip install opencanary
+pip install scapy pcapy # optional
 
 sudo systemctl enable opencanary.service
 sudo systemctl start opencanary
