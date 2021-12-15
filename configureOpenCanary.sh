@@ -118,7 +118,7 @@ echo "
         }
       }
   },
-  \"portscan.enabled\": true,
+  \"portscan.enabled\": false,
   \"portscan.ignore_localhost\": true,
   \"portscan.logfile\":\"/var/log/kern.log\",
   \"portscan.synrate\": 5,
