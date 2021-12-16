@@ -50,14 +50,19 @@ cd /home/pi/OpenCanary || exit 100
 virtualenv env/
 . env/bin/activate
 
-sudo systemctl restart rsyslog
-sudo systemctl restart syslog
-sudo smbcontrol all reload-config
-sudo systemctl restart smbd
-sudo systemctl restart nmbd
-
 pip install opencanary
 pip install scapy pcapy # optional
+
+sudo systemctl daemon-reload || exit 100
+sudo systemctl restart rsyslog || exit 100
+sudo systemctl restart syslog || exit 100
+sudo smbcontrol all reload-config || exit 100
+sudo systemctl restart smbd || exit 100
+sudo systemctl restart nmbd || exit 100
+
+sudo systemctl enable opencanarylistener.service || exit 100
+sudo systemctl start opencanarylistener || exit 100
+sudo systemctl status opencanarylistener || exit 100
 
 sudo systemctl enable opencanary.service
 sudo systemctl start opencanary
