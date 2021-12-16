@@ -35,7 +35,8 @@ echoInfo "script" "* Upgrading Open Canary *"
 cd /home/pi/OpenCanary || exit 100
 . env/bin/activate || exit 100
 
-sudo systemctl stop opencanary || exit 100
+sudo systemctl stop opencanary
+sudo systemctl stop opencanarylistener
 
 pip install opencanary --upgrade || exit 100
 

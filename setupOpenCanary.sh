@@ -231,7 +231,7 @@ ExecStop=/home/pi/OpenCanary/env/bin/opencanaryd --stop
 WantedBy=multi-user.target
 " > /etc/systemd/system/opencanary.service
 
-sudo chmod +x "${SCRIPT_DIR}/raspberrypi/listenerOpenCanary.sh"
+sudo chmod +x "${SCRIPT_DIR}/listenerOpenCanary.sh"
 
 echo "
 [Unit]
@@ -243,7 +243,7 @@ After=network.target
 User=root
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/bash ${SCRIPT_DIR}/raspberrypi/listenerOpenCanary.sh
+ExecStart=/bin/bash ${SCRIPT_DIR}/listenerOpenCanary.sh
 
 [Install]
 WantedBy=multi-user.target
