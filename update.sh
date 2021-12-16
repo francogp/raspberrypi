@@ -29,6 +29,10 @@ if [ -z ${updateFirmwareScriptName+x} ]; then
   source "${SCRIPT_DIR}/updateFirmware.sh"
 fi
 
-if [ -z ${updatePsadScriptName+x} ]; then
-  source "${SCRIPT_DIR}/updatePsad.sh"
+if [ -z ${updateOpenCanaryScriptName+x} ]; then
+  source "${SCRIPT_DIR}/updateOpenCanary.sh"
 fi
+
+#if [ -z ${updatePsadScriptName+x} ]; then
+#  source "${SCRIPT_DIR}/updatePsad.sh"
+#fi

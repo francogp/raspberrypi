@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2021. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
 #
-configureOpenCanaryScriptName="configureOpenCanary.sh"
+installOpenCanaryScriptName="installOpenCanary.sh"
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
@@ -26,6 +26,17 @@ fi
 if [ -z ${setupOpenCanaryScriptName+x} ]; then
   source "${SCRIPT_DIR}/setupOpenCanary.sh"
 fi
+
+echoInfo "script" "Configuring iptables"
+sudo apt install -y iptables || exit 100
+sudo iptables -D INPUT -j LOG
+sudo iptables -A INPUT -j LOG || exit 100
+sudo iptables -D FORWARD -j LOG
+sudo iptables -A FORWARD -j LOG || exit 100
+sudo ip6tables -D INPUT -j LOG
+sudo ip6tables -A INPUT -j LOG || exit 100
+sudo ip6tables -D FORWARD -j LOG
+sudo ip6tables -A FORWARD -j LOG || exit 100
 
 echoInfo "script" "* Installing Open Canary *"
 sudo /home/pi/OpenCanary/env/bin/opencanaryd --stop

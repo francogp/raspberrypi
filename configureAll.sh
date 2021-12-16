@@ -20,6 +20,9 @@ fi
 
 echoInfo "script" "* Configuring ALL *"
 
+sudo chown root:root "${SCRIPT_DIR}/../raspberrypi" || exit 100
+sudo chmod 700 "${SCRIPT_DIR}/../raspberrypi" || exit 100
+
 if [ -z ${configureHostnameScriptName+x} ]; then
   source "${SCRIPT_DIR}/configureHostname.sh"
 fi
@@ -40,12 +43,12 @@ if [ -z ${configureSSHScriptName+x} ]; then
   source "${SCRIPT_DIR}/configureSSH.sh"
 fi
 
-if [ -z ${configurePsadScriptName+x} ]; then
-  source "${SCRIPT_DIR}/configurePsad.sh"
-fi
+#if [ -z ${installPsadScriptName+x} ]; then
+#  source "${SCRIPT_DIR}/installPsad.sh"
+#fi
 
-if [ -z ${configureOpenCanaryScriptName+x} ]; then
-  source "${SCRIPT_DIR}/configureOpenCanary.sh"
+if [ -z ${installOpenCanaryScriptName+x} ]; then
+  source "${SCRIPT_DIR}/installOpenCanary.sh"
 fi
 
 if [ -z ${updateFirmwareScriptName+x} ]; then
