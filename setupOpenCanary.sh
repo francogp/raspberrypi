@@ -233,6 +233,8 @@ WantedBy=multi-user.target
 " > /etc/systemd/system/opencanary.service
 
 sudo cp "${SCRIPT_DIR}/listenerOpenCanary.sh" "/root/listenerOpenCanary.sh"
+sudo cp "${SCRIPT_DIR}/configs.sh" "/root/configs.sh"
+sudo cp "${SCRIPT_DIR}/include.sh" "/root/include.sh"
 sudo chmod +x "/root/listenerOpenCanary.sh"
 
 echo "
