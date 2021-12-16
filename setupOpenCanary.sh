@@ -24,20 +24,6 @@ fi
 
 echoInfo "script" "* Configuring Open Canary preferences *"
 
-if [ -z ${reportPsadTo+x} ]; then
-  echoError "configs.sh" "var reportPsadTo is unset"
-  exit 100
-else
-  echoInfo "configs.sh" "reportPsadTo is set to '${reportPsadTo}'"
-fi
-
-if [ -z ${reportOpenCanaryTo+x} ]; then
-  echoError "configs.sh" "var reportOpenCanaryTo is unset"
-  exit 100
-else
-  echoInfo "configs.sh" "reportOpenCanaryTo is set to '${reportOpenCanaryTo}'"
-fi
-
 if [ -z ${reportIpToIgnoreOpenCanaryTo+x} ]; then
   echoError "configs.sh" "var reportIpToIgnoreOpenCanaryTo is unset"
   exit 100
