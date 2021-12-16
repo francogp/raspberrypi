@@ -42,8 +42,7 @@ echoInfo "script" "* Installing Open Canary *"
 sudo /home/pi/OpenCanary/env/bin/opencanaryd --stop
 sudo systemctl stop opencanary
 
-sudo apt install -y python3-dev python3-pip python3-virtualenv python3-venv python3-scapy libssl-dev libpcap-dev
-sudo apt install -y samba # if you plan to use the smb module
+sudo apt install -y python3-dev python3-pip python3-virtualenv python3-venv python3-scapy libssl-dev libpcap-dev jq samba
 
 sudo mkdir -p /home/pi/OpenCanary
 cd /home/pi/OpenCanary || exit 100

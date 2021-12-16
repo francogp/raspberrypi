@@ -95,32 +95,28 @@ echo "
   \"httpproxy.skin\": \"squid\",
   \"logger\": {
       \"class\": \"PyLogger\",
-        \"kwargs\": {
-          \"formatters\": {
-            \"plain\": {
-              \"format\": \"%(message)s\"
-            },
-            \"syslog_rfc\": {
-              \"format\": \"opencanaryd[%(process)-5s:%(thread)d]: %(name)s %(levelname)-5s %(message)s\"
-            }
+      \"kwargs\": {
+        \"formatters\": {
+          \"plain\": {
+            \"format\": \"%(message)s\"
           },
-          \"handlers\": {
-            \"console\": {
+          \"syslog_rfc\": {
+            \"format\": \"opencanaryd[%(process)-5s:%(thread)d]: %(name)s %(levelname)-5s %(message)s\"
+          }
+        },
+        \"handlers\": {
+          \"json-tcp\": {
+             \"class\": \"opencanary.logger.SocketJSONHandler\",
+             \"host\": \"127.0.0.1\", # change to correlator IP
+             \"port\": 1514
+          },
+          \"console\": {
             \"class\": \"logging.StreamHandler\",
             \"stream\": \"ext://sys.stdout\"
           },
           \"file\": {
             \"class\": \"logging.FileHandler\",
             \"filename\": \"/var/tmp/opencanary.log\"
-          },
-          \"SMTP\": {
-            \"class\": \"logging.handlers.SMTPHandler\",
-            \"mailhost\": [\"smtp.cevt.ar\", 587],
-            \"fromaddr\": \"${mailFullName} <${mailAddress}>\",
-            \"toaddrs\" : [${reportOpenCanaryTo}],
-            \"subject\" : \"OpenCanary Alert\",
-            \"credentials\" : [\"${mailAddress}\", \"${mailPassword}\"],
-            \"secure\" : []
           }
         }
       }
