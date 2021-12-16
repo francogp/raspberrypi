@@ -2,6 +2,9 @@
 #
 # Copyright (c) 2021. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
 #
+
+#sudo bash raspberrypi/setupOpenCanary.sh
+
 setupOpenCanaryScriptName="setupOpenCanary.sh"
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
@@ -107,7 +110,7 @@ echo "
         \"handlers\": {
           \"json-tcp\": {
              \"class\": \"opencanary.logger.SocketJSONHandler\",
-             \"host\": \"127.0.0.1\", # change to correlator IP
+             \"host\": \"127.0.0.1\",
              \"port\": 1514
           },
           \"console\": {
