@@ -3,6 +3,12 @@
 # Copyright (c) 2021. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
 #
 
+# sudo bash raspberrypi/configureCrontab.sh
+
+configureCrontabScriptName="configureCrontab.sh"
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 if [ -z ${includeScriptName+x} ]; then
   source "${SCRIPT_DIR}/include.sh"
 fi

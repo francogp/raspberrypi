@@ -54,3 +54,7 @@ fi
 if [ -z ${updateFirmwareScriptName+x} ]; then
   source "${SCRIPT_DIR}/updateFirmware.sh"
 fi
+
+if [ -z ${configureCrontabScriptName+x} ]; then
+  source "${SCRIPT_DIR}/configureCrontab.sh"
+fi
