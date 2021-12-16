@@ -106,6 +106,7 @@ function sendMail() {
   msg="${1}"
   dangerLevel="${2}"
 #  jsonParsedLine=$(jq . <<<"${msg}")
+  columns="Fecha\tTipo\tHost Origen\tPuerto Origen\tHost Destino\tPuerto Destino\tDispositivo\t\Datos\n"
   jsonParsedLineTable=$(jq -r '.[] | "\(.local_time)\t\(.logtype)\t\(.src_host)\t\(.src_port)\t\(.dst_host)\t\(.dst_port)\t\(.node_id)\t\(.logdata)"' <<<"${msg}")
   if [[ "$dangerLevel" -eq 0 ]]; then
     dangerMsg="Baja Importancia"
@@ -115,8 +116,8 @@ function sendMail() {
     targetMail="${reportOpenCanaryDangerTo}"
   fi
   echo "DANGER LEVEL = ${dangerLevel}"
-  echo "${jsonParsedLineTable}"
-  echo -e "${jsonParsedLineTable}" | sudo mutt -e "set content_type=text/plain" -s "OpenCanary: ${dangerMsg}" -- "${targetMail}"
+#  echo "${columns}${jsonParsedLineTable}"
+  echo -e "${columns}${jsonParsedLineTable}" | sudo mutt -e "set content_type=text/plain" -s "OpenCanary: ${dangerMsg}" -- "${targetMail}"
 }
 
 counterDanger=0
