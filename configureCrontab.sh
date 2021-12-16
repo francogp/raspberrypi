@@ -3,14 +3,6 @@
 # Copyright (c) 2021. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
 #
 
-source /opt/systemScripts/uBin/myLogTools.sh
-if [[ $(/usr/bin/id -u) -ne 0 ]]; then
-  echoError "user" "not running as root"
-  exit 1
-fi
-
-#------------------------------------------------------------------
-
 if [ -z ${includeScriptName+x} ]; then
   source "${SCRIPT_DIR}/include.sh"
 fi
