@@ -244,3 +244,19 @@ ExecStop=/home/pi/OpenCanary/env/bin/opencanaryd --stop
 [Install]
 WantedBy=multi-user.target
 " > /etc/systemd/system/opencanary.service
+
+echo "
+[Unit]
+Description=OpenCanary Listener
+After=syslog.target
+After=network.target
+
+[Service]
+User=root
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=${SCRIPT_DIR}/listenerOpenCanary.sh
+
+[Install]
+WantedBy=multi-user.target
+" > /etc/systemd/system/opencanarylistener.service

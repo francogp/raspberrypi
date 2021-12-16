@@ -3,6 +3,8 @@
 # Copyright (c) 2021. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
 #
 
+#sudo bash raspberrypi/listenerOpenCanary.sh
+
 # ======== START configs ========
 MSG_UNTIL_SEND_MAIL=10
 LOW_DANGER_MSG_GE_THAN=2000

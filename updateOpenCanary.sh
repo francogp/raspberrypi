@@ -39,6 +39,7 @@ sudo systemctl stop opencanary || exit 100
 
 pip install opencanary --upgrade || exit 100
 
+sudo systemctl daemon-reload || exit 100
 sudo systemctl restart rsyslog || exit 100
 sudo systemctl restart syslog || exit 100
 sudo smbcontrol all reload-config || exit 100
@@ -48,3 +49,7 @@ sudo systemctl restart nmbd || exit 100
 sudo systemctl enable opencanary.service || exit 100
 sudo systemctl start opencanary || exit 100
 sudo systemctl status opencanary || exit 100
+
+sudo systemctl enable opencanarylistener.service || exit 100
+sudo systemctl start opencanarylistener || exit 100
+sudo systemctl status opencanarylistener || exit 100
