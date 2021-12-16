@@ -242,7 +242,6 @@ After=network.target
 [Service]
 User=root
 Group=root
-Type=oneshot
 ExecStart=/bin/bash ${SCRIPT_DIR}/listenerOpenCanary.sh
 
 [Install]
