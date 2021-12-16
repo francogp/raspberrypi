@@ -28,7 +28,7 @@ fi
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 MAILTO=\"\"
 
-15 6 * * MON root /bin/bash ${SCRIPT_DIR}/update.sh 2>&1 > /dev/null
+0 6 * * MON root /bin/bash ${SCRIPT_DIR}/update.sh 2>&1 > /dev/null
 " >/etc/cron.d/myScripts || exit 100
 
 echoInfo "script" "refreshing cron"
