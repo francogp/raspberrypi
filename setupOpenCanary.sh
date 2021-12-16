@@ -241,7 +241,7 @@ After=network.target
 User=root
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=${SCRIPT_DIR}/listenerOpenCanary.sh
+ExecStart=${SCRIPT_DIR}/raspberrypi/listenerOpenCanary.sh
 
 [Install]
 WantedBy=multi-user.target

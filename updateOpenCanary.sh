@@ -46,10 +46,10 @@ sudo smbcontrol all reload-config || exit 100
 sudo systemctl restart smbd || exit 100
 sudo systemctl restart nmbd || exit 100
 
-sudo systemctl enable opencanary.service || exit 100
-sudo systemctl start opencanary || exit 100
-sudo systemctl status opencanary || exit 100
-
 sudo systemctl enable opencanarylistener.service || exit 100
 sudo systemctl start opencanarylistener || exit 100
 sudo systemctl status opencanarylistener || exit 100
+
+sudo systemctl enable opencanary.service || exit 100
+sudo systemctl start opencanary || exit 100
+sudo systemctl status opencanary || exit 100
