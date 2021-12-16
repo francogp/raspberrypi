@@ -219,6 +219,7 @@ echo "
 Description=OpenCanary
 After=syslog.target
 After=network.target
+After=opencanarylistener.service
 
 [Service]
 User=root
@@ -247,3 +248,5 @@ ExecStart=/bin/bash ${SCRIPT_DIR}/listenerOpenCanary.sh
 [Install]
 WantedBy=multi-user.target
 " > /etc/systemd/system/opencanarylistener.service
+
+sudo systemctl daemon-reload || exit 100

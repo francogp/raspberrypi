@@ -54,6 +54,7 @@ pip install opencanary
 pip install scapy pcapy # optional
 
 sudo systemctl daemon-reload || exit 100
+
 sudo systemctl restart rsyslog || exit 100
 sudo systemctl restart syslog || exit 100
 sudo smbcontrol all reload-config || exit 100
