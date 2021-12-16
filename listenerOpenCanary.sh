@@ -39,53 +39,53 @@ fi
 
 declare -A LogTypes
 LogTypes=(
-  ["1000"]="LOG_BASE_BOOT"
-  ["1001"]="LOG_BASE_MSG"
-  ["1002"]="LOG_BASE_DEBUG"
-  ["1003"]="LOG_BASE_ERROR"
-  ["1004"]="LOG_BASE_PING"
-  ["1005"]="LOG_BASE_CONFIG_SAVE"
-  ["1006"]="LOG_BASE_EXAMPLE"
-  ["2000"]="LOG_FTP_LOGIN_ATTEMPT"
-  ["3000"]="LOG_HTTP_GET"
-  ["3001"]="LOG_HTTP_POST_LOGIN_ATTEMPT"
-  ["4000"]="LOG_SSH_NEW_CONNECTION"
-  ["4001"]="LOG_SSH_REMOTE_VERSION_SENT"
-  ["4002"]="LOG_SSH_LOGIN_ATTEMPT"
-  ["5000"]="LOG_SMB_FILE_OPEN"
-  ["5001"]="LOG_PORT_SYN"
-  ["5002"]="LOG_PORT_NMAPOS"
-  ["5003"]="LOG_PORT_NMAPNULL"
-  ["5004"]="LOG_PORT_NMAPXMAS"
-  ["5005"]="LOG_PORT_NMAPFIN"
-  ["6001"]="LOG_TELNET_LOGIN_ATTEMPT"
-  ["7001"]="LOG_HTTPPROXY_LOGIN_ATTEMPT"
-  ["8001"]="LOG_MYSQL_LOGIN_ATTEMPT"
-  ["9001"]="LOG_MSSQL_LOGIN_SQLAUTH"
-  ["9002"]="LOG_MSSQL_LOGIN_WINAUTH"
-  ["10001"]="LOG_TFTP"
-  ["11001"]="LOG_NTP_MONLIST"
-  ["12001"]="LOG_VNC"
-  ["13001"]="LOG_SNMP_CMD"
-  ["14001"]="LOG_RDP"
-  ["15001"]="LOG_SIP_REQUEST"
-  ["16001"]="LOG_GIT_CLONE_REQUEST"
-  ["17001"]="LOG_REDIS_COMMAND"
-  ["18001"]="LOG_TCP_BANNER_CONNECTION_MADE"
-  ["18002"]="LOG_TCP_BANNER_KEEP_ALIVE_CONNECTION_MADE"
-  ["18003"]="LOG_TCP_BANNER_KEEP_ALIVE_SECRET_RECEIVED"
-  ["18004"]="LOG_TCP_BANNER_KEEP_ALIVE_DATA_RECEIVED"
-  ["18005"]="LOG_TCP_BANNER_DATA_RECEIVED"
-  ["99000"]="LOG_USER_0"
-  ["99001"]="LOG_USER_1"
-  ["99002"]="LOG_USER_2"
-  ["99003"]="LOG_USER_3"
-  ["99004"]="LOG_USER_4"
-  ["99005"]="LOG_USER_5"
-  ["99006"]="LOG_USER_6"
-  ["99007"]="LOG_USER_7"
-  ["99008"]="LOG_USER_8"
-  ["99009"]="LOG_USER_9"
+  ["1000"]="BASE BOOT"
+  ["1001"]="BASE MSG"
+  ["1002"]="BASE DEBUG"
+  ["1003"]="BASE ERROR"
+  ["1004"]="BASE PING"
+  ["1005"]="BASE CONFIG SAVE"
+  ["1006"]="BASE EXAMPLE"
+  ["2000"]="FTP LOGIN ATTEMPT"
+  ["3000"]="HTTP GET"
+  ["3001"]="HTTP POST LOGIN ATTEMPT"
+  ["4000"]="SSH NEW CONNECTION"
+  ["4001"]="SSH REMOTE VERSION SENT"
+  ["4002"]="SSH LOGIN ATTEMPT"
+  ["5000"]="SMB FILE OPEN"
+  ["5001"]="PORT SYN"
+  ["5002"]="PORT NMAP OS"
+  ["5003"]="PORT NMAP NULL"
+  ["5004"]="PORT NMAP XMAS"
+  ["5005"]="PORT NMAP FIN"
+  ["6001"]="TELNET LOGIN ATTEMPT"
+  ["7001"]="HTTPPROXY LOGIN ATTEMPT"
+  ["8001"]="MYSQL LOGIN ATTEMPT"
+  ["9001"]="MSSQL LOGIN SQL AUTH"
+  ["9002"]="MSSQL LOGIN WIN AUTH"
+  ["10001"]="TFTP"
+  ["11001"]="NTP MONLIST"
+  ["12001"]="VNC"
+  ["13001"]="SNMP CMD"
+  ["14001"]="RDP"
+  ["15001"]="SIP REQUEST"
+  ["16001"]="GIT CLONE REQUEST"
+  ["17001"]="REDIS COMMAND"
+  ["18001"]="TCP BANNER CONNECTION MADE"
+  ["18002"]="TCP BANNER KEEP ALIVE CONNECTION MADE"
+  ["18003"]="TCP BANNER KEEP ALIVE SECRET RECEIVED"
+  ["18004"]="TCP BANNER KEEP ALIVE DATA RECEIVED"
+  ["18005"]="TCP BANNER DATA RECEIVED"
+  ["99000"]="USER 0"
+  ["99001"]="USER 1"
+  ["99002"]="USER 2"
+  ["99003"]="USER 3"
+  ["99004"]="USER 4"
+  ["99005"]="USER 5"
+  ["99006"]="USER 6"
+  ["99007"]="USER 7"
+  ["99008"]="USER 8"
+  ["99009"]="USER 9"
 
 )
 
@@ -102,9 +102,11 @@ function cleanup() {
 trap cleanup SIGINT
 
 function sendMail() {
+  #  echo "${LogTypes[${logType}]}"
   msg="${1}"
   dangerLevel="${2}"
-  jsonParsedLine=$(jq . <<<"${msg}")
+#  jsonParsedLine=$(jq . <<<"${msg}")
+  jsonParsedLineTable=$(jq -r '.[] | "\(.local_time)\t\(.logtype)\t\(.src_host)\t\(.src_port)\t\(.dst_host)\t\(.dst_port)\t\(.node_id)\t\(.logdata)"' <<<"${msg}")
   if [[ "$dangerLevel" -eq 0 ]]; then
     dangerMsg="Baja Importancia"
     targetMail="${reportOpenCanaryLowDangerTo}"
@@ -113,33 +115,43 @@ function sendMail() {
     targetMail="${reportOpenCanaryDangerTo}"
   fi
   echo "DANGER LEVEL = ${dangerLevel}"
-  echo "${jsonParsedLine}"
-  echo -e "${jsonParsedLine}" | sudo mutt -e "set content_type=text/plain" -s "OpenCanary: ${dangerMsg}" -- "${targetMail}"
+  echo "${jsonParsedLineTable}"
+  echo -e "${jsonParsedLineTable}" | sudo mutt -e "set content_type=text/plain" -s "OpenCanary: ${dangerMsg}" -- "${targetMail}"
 }
 
-dangerLevel=0
-counter=0
-msg="["
+counterDanger=0
+counterLow=0
+msgDanger="["
+msgLow="["
 while read -r line; do
   # ======= process line =======
   logType=$(jq '.logtype' <<<"${line}")
   if [[ "$logType" -ge ${LOW_DANGER_MSG_GE_THAN} ]]; then
-    dangerLevel=$((dangerLevel + 1))
-  fi
-  #  echo "${LogTypes[${logType}]}"
-
-  # ======= append line to mail =========
-  msg+="${line}"
-  counter=$((counter + 1))
-  if [[ "$counter" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
-    msg+="]"
-    # FORK function and continue
-    sendMail "${msg}" "${dangerLevel}" &
-    msg="["
-    counter=0
-    dangerLevel=0
+    # ======= append to DANGER mail =========
+    msgDanger+="${line}"
+    counterDanger=$((counterDanger + 1))
+    if [[ "$counterDanger" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
+      msgDanger+="]"
+      # FORK function and continue
+      sendMail "${msgDanger}" "1" &
+      msgDanger="["
+      counterDanger=0
+    else
+      msgDanger+=","
+    fi
   else
-    msg+=","
+    # ======= append to low mail =========
+    msgLow+="${line}"
+    counterLow=$((counterLow + 1))
+    if [[ "$counterLow" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
+      msgLow+="]"
+      # FORK function and continue
+      sendMail "${msgLow}" "0" &
+      msgLow="["
+      counterLow=0
+    else
+      msgLow+=","
+    fi
   fi
 done < <(nc -q -1 -k -l localhost 1514)
 
