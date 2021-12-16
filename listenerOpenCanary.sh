@@ -4,7 +4,7 @@
 #
 
 # ======== START configs ========
-MSG_UNTIL_SEND_MAIL=2
+MSG_UNTIL_SEND_MAIL=10
 LOW_DANGER_MSG_GE_THAN=2000
 # ======== END configs ========
 
