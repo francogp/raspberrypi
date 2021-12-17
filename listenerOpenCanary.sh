@@ -6,7 +6,7 @@
 #sudo bash raspberrypi/listenerOpenCanary.sh
 
 # ======== START configs ========
-MSG_UNTIL_SEND_MAIL=10
+MSG_UNTIL_SEND_MAIL=1000
 LOW_DANGER_MSG_GE_THAN=2000
 # ======== END configs ========
 
@@ -89,24 +89,24 @@ LogTypes=(
 
 )
 
-function cleanup() {
-  echo ""
-  echo "Cleaning connections..."
-  sudo pkill -fx 'nc -q -1 -k -l localhost 1514'
-  echo "Listening ports running:"
-  sudo netstat -ltup | grep 1514
-  echo "Service Stop!"
-  exit 0
+#kill all subprocess on exit
+trap 'trap - SIGTERM && kill -- -$$' SIGINT SIGTERM EXIT
+
+function commit() {
+  while true; do
+    echo 'COMMIT!;' | nc -v -q 1 localhost 1514
+    sleep 60s
+  done
 }
 
-trap cleanup SIGINT
+commit &
 
 function sendMail() {
   #  echo "${LogTypes[${logType}]}"
   msg="${1}"
   dangerLevel="${2}"
-#  jsonParsedLine=$(jq . <<<"${msg}")
-  columns="Fecha\tTipo\tHost Origen\tPuerto Origen\tHost Destino\tPuerto Destino\tDispositivo\t\Datos\n"
+  #  jsonParsedLine=$(jq . <<<"${msg}")
+  columns="Fecha\tTipo\tHost Origen\tPuerto Origen\tHost Destino\tPuerto Destino\tDispositivo\tDatos\n"
   jsonParsedLineTable=$(jq -r '.[] | "\(.local_time)\t\(.logtype)\t\(.src_host)\t\(.src_port)\t\(.dst_host)\t\(.dst_port)\t\(.node_id)\t\(.logdata)"' <<<"${msg}")
   if [[ "$dangerLevel" -eq 0 ]]; then
     dangerMsg="Baja Importancia"
@@ -115,7 +115,10 @@ function sendMail() {
     dangerMsg="Importante!"
     targetMail="${reportOpenCanaryDangerTo}"
   fi
-  echo "DANGER LEVEL = ${dangerLevel}"
+#  echo "DANGER LEVEL = ${dangerLevel}"
+#  echo "Original:"
+#  echo "${msg}"
+#  echo "Parsed:"
 #  echo "${columns}${jsonParsedLineTable}"
   echo -e "${columns}${jsonParsedLineTable}" | sudo mutt -e "set content_type=text/plain" -s "OpenCanary: ${dangerMsg}" -- "${targetMail}"
 }
@@ -125,36 +128,63 @@ counterLow=0
 msgDanger="["
 msgLow="["
 while read -r line; do
-  # ======= process line =======
-  logType=$(jq '.logtype' <<<"${line}")
-  if [[ "$logType" -ge ${LOW_DANGER_MSG_GE_THAN} ]]; then
-    # ======= append to DANGER mail =========
-    msgDanger+="${line}"
-    counterDanger=$((counterDanger + 1))
-    if [[ "$counterDanger" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
-      msgDanger+="]"
+  if [ "$line" = "COMMIT!;" ]; then
+#    echo "committing!!!!!!!"
+    if [[ $counterDanger -gt 0 ]]; then
+      msgDanger="${msgDanger::-1}]"
       # FORK function and continue
       sendMail "${msgDanger}" "1" &
       msgDanger="["
       counterDanger=0
-    else
-      msgDanger+=","
+#    else
+#      echo "ignoring danger commit"
     fi
-  else
-    # ======= append to low mail =========
-    msgLow+="${line}"
-    counterLow=$((counterLow + 1))
-    if [[ "$counterLow" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
-      msgLow+="]"
+    if [[ $counterLow -gt 0 ]]; then
+      msgLow="${msgLow::-1}]"
       # FORK function and continue
       sendMail "${msgLow}" "0" &
       msgLow="["
       counterLow=0
+#    else
+#      echo "ignoring low commit"
+    fi
+  else
+    # ======= process line =======
+    logType=$(jq '.logtype' <<<"${line}")
+    if [[ "$logType" -ge ${LOW_DANGER_MSG_GE_THAN} ]]; then
+      # ======= append to DANGER mail =========
+      msgDanger+="${line}"
+      counterDanger=$((counterDanger + 1))
+      if [[ "$counterDanger" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
+        msgDanger+="]"
+        # FORK function and continue
+        sendMail "${msgDanger}" "1" &
+        msgDanger="["
+        counterDanger=0
+      else
+        msgDanger+=","
+      fi
     else
-      msgLow+=","
+      # ======= append to low mail =========
+      msgLow+="${line}"
+      counterLow=$((counterLow + 1))
+      if [[ "$counterLow" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
+        msgLow+="]"
+        # FORK function and continue
+        sendMail "${msgLow}" "0" &
+        msgLow="["
+        counterLow=0
+      else
+        msgLow+=","
+      fi
     fi
   fi
 done < <(nc -q -1 -k -l localhost 1514)
+
+echo "main thread finished"
+
+#test
+#echo '{"dst_host": "9.9.9.9", "dst_port": 21, "local_time": "2015-07-20 13:38:21.281259", "logdata": {"PASSWORD": "default", "USERNAME": "admin"}, "logtype": 1000, "node_id": "AlertTest","src_host": "8.8.8.8", "src_port": 49635}' | nc -v -q 1 localhost 1514
 
 #sudo netstat -ltup | grep 1514
 #jq '.' <<<  '[{"dst_host": "9.9.9.9", "dst_port": 21, "local_time": "2015-07-20 13:38:21.281259", "logdata": {"PASSWORD": "default", "USERNAME": "admin"}, "logtype": 2000, "node_id": "AlertTest","src_host": "8.8.8.8", "src_port": 49635},{"dst_host": "8.9.9.8", "dst_port": 217, "local_time": "2015-07-20 13:39:27.59", "logdata": {"PASSWORD": "default4", "USERNAME": "admin2"}, "logtype": 2001, "node_id": "AlertTest","src_host": "8.4.8.4", "src_port": 496335}]'
