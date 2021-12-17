@@ -171,7 +171,8 @@ ${jsonParsedLineTable}
   #  echo "Parsed:"
   #  echo "${columns}${jsonParsedLineTable}"
   echo "Sending email..."
-  echo "${output}" | sudo mutt -e "set content_type=text/html" -s "Honeypot: ${dangerMsg}" -- "${targetMail}"
+  echo -e "${output}" | sudo mutt -e "set content_type=text/html" -s "Honeypot: ${dangerMsg}" -- "${targetMail}"
+  echo "Email sent"
 }
 
 counterDanger=0
