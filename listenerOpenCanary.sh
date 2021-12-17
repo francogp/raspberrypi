@@ -102,10 +102,11 @@ done
 trap cleanup EXIT
 
 function periodicCommit() {
+  echo "periodic commit => sleeping"
   sleep 60s
-  echo "periodic commit: sending"
-  echo 'COMMIT!;' | nc -N -q 10 127.0.0.1 1514
-  echo "periodic commit: submitted"
+  echo "periodic commit => sending"
+  echo 'COMMIT!;' | nc -N 127.0.0.1 1514
+  echo "periodic commit => submitted"
   periodicCommit &
   exit 0
 }
@@ -123,7 +124,7 @@ function replaceValues() {
 
 function sendMail() {
   #  msg="${1}"
-  echo "Formatting email..."
+  echo "Email => Formatting ..."
   #replace known values
   msg=$(replaceValues "${1}")
   dangerLevel="${2}"
@@ -180,9 +181,9 @@ ${jsonParsedLineTable}
   #  echo "${msg}"
   #  echo "Parsed:"
   #  echo "${columns}${jsonParsedLineTable}"
-  echo "Sending email..."
+  echo "Email => Sending..."
   echo -e "${output}" | sudo mutt -e "set content_type=text/html" -s "Honeypot: ${dangerMsg}" -- "${targetMail}"
-  echo "Email sent"
+  echo "Email => SENT!"
 }
 
 counterDanger=0
@@ -190,8 +191,8 @@ counterLow=0
 msgDanger="["
 msgLow="["
 while read -r line; do
-  echo "${line}"
   if [ "$line" = "COMMIT!;" ]; then
+    echo "COMMIT => arrived"
     if [[ $counterDanger -gt 0 ]]; then
       msgDanger="${msgDanger::-1}]"
       # FORK function and continue
@@ -211,6 +212,7 @@ while read -r line; do
       #      echo "ignoring low commit"
     fi
   else
+    echo "MSG => ${line}"
     # ======= process line =======
     logType=$(jq '.logtype' <<<"${line}")
     if [[ "$logType" -ge ${LOW_DANGER_MSG_GE_THAN} ]]; then
