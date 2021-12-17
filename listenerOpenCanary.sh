@@ -93,7 +93,7 @@ trap 'trap - SIGTERM && kill -- -$$' SIGINT SIGTERM EXIT
 
 function commit() {
   while true; do
-    echo 'COMMIT!;' | nc -v -N -q 5 localhost 1514
+    echo 'COMMIT!;' | nc -v -N localhost 1514
     sleep 60s
   done
 }
