@@ -21,6 +21,8 @@
 # ======== START configs ========
 MSG_UNTIL_SEND_MAIL=1000
 LOW_DANGER_MSG_GE_THAN=2000
+OPEN_CANARY_LISTEN_PORT=1514
+OPEN_CANARY_MAILER_PORT=1515
 # ======== END configs ========
 
 listenerOpenCanaryScriptName="listenerOpenCanary.sh"
@@ -115,13 +117,13 @@ done
 trap cleanup EXIT
 
 function periodicCommit() {
-  echo "periodic commit => sleeping"
-  sleep 60s
-  echo "periodic commit => sending"
-  echo -e "COMMIT!;" | nc -N -q 0 127.0.0.1 1514
-  echo "periodic commit => submitted"
-  periodicCommit &
-  exit 0
+  while true; do
+    echo "periodic commit => sleeping"
+    sleep 60s
+    echo "periodic commit => sending"
+    echo -e "COMMIT!;" | nc -N -q 0 127.0.0.1 ${OPEN_CANARY_MAILER_PORT}
+    echo "periodic commit => submitted"
+  done
 }
 
 periodicCommit &
@@ -199,65 +201,81 @@ ${jsonParsedLineTable}
   echo "Email => SENT!"
 }
 
-counterDanger=0
-counterLow=0
-msgDanger="["
-msgLow="["
-echo "Listener => waiting new line..."
-while read -r line; do
-  if [ "$line" = "COMMIT!;" ]; then
-    echo "COMMIT => arrived"
-    if [[ $counterDanger -gt 0 ]]; then
-      msgDanger="${msgDanger::-1}]"
-      # FORK function and continue
-      sendMail "${msgDanger}" "1" &
-      msgDanger="["
-      counterDanger=0
-      #    else
-      #      echo "ignoring danger commit"
-    fi
-    if [[ $counterLow -gt 0 ]]; then
-      msgLow="${msgLow::-1}]"
-      # FORK function and continue
-      sendMail "${msgLow}" "0" &
-      msgLow="["
-      counterLow=0
-      #    else
-      #      echo "ignoring low commit"
-    fi
-  else
-    echo "MSG => ${line}"
-    # ======= process line =======
-    logType=$(jq '.logtype' <<<"${line}")
-    if [[ "$logType" -ge ${LOW_DANGER_MSG_GE_THAN} ]]; then
-      # ======= append to DANGER mail =========
-      msgDanger+="${line}"
-      counterDanger=$((counterDanger + 1))
-      if [[ "$counterDanger" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
-        msgDanger+="]"
-        # FORK function and continue
-        sendMail "${msgDanger}" "1" &
-        msgDanger="["
-        counterDanger=0
+function listenerMailer() {
+    counterDanger=0
+    counterLow=0
+    msgDanger="["
+    msgLow="["
+    echo "Listener Mailer => waiting new line..."
+    while read -r line; do
+      if [ "$line" = "COMMIT!;" ]; then
+        echo "Listener Mailer: COMMIT => arrived"
+        if [[ $counterDanger -gt 0 ]]; then
+          msgDanger="${msgDanger::-1}]"
+          # FORK function and continue
+          sendMail "${msgDanger}" "1" &
+          msgDanger="["
+          counterDanger=0
+          #    else
+          #      echo "ignoring danger commit"
+        fi
+        if [[ $counterLow -gt 0 ]]; then
+          msgLow="${msgLow::-1}]"
+          # FORK function and continue
+          sendMail "${msgLow}" "0" &
+          msgLow="["
+          counterLow=0
+          #    else
+          #      echo "ignoring low commit"
+        fi
       else
-        msgDanger+=","
+        echo "Listener Mailer: MSG => ${line}"
+        # ======= process line =======
+        logType=$(jq '.logtype' <<<"${line}")
+        if [[ "$logType" -ge ${LOW_DANGER_MSG_GE_THAN} ]]; then
+          # ======= append to DANGER mail =========
+          msgDanger+="${line}"
+          counterDanger=$((counterDanger + 1))
+          if [[ "$counterDanger" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
+            msgDanger+="]"
+            # FORK function and continue
+            sendMail "${msgDanger}" "1" &
+            msgDanger="["
+            counterDanger=0
+          else
+            msgDanger+=","
+          fi
+        else
+          # ======= append to low mail =========
+          msgLow+="${line}"
+          counterLow=$((counterLow + 1))
+          if [[ "$counterLow" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
+            msgLow+="]"
+            # FORK function and continue
+            sendMail "${msgLow}" "0" &
+            msgLow="["
+            counterLow=0
+          else
+            msgLow+=","
+          fi
+        fi
       fi
-    else
-      # ======= append to low mail =========
-      msgLow+="${line}"
-      counterLow=$((counterLow + 1))
-      if [[ "$counterLow" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
-        msgLow+="]"
-        # FORK function and continue
-        sendMail "${msgLow}" "0" &
-        msgLow="["
-        counterLow=0
-      else
-        msgLow+=","
-      fi
-    fi
-  fi
-  echo "Listener => waiting new line..."
-done < <(nc -k -l 127.0.0.1 1514)
+      echo "Listener Mailer => waiting new line..."
+    done < <(nc -k -l 127.0.0.1 ${OPEN_CANARY_MAILER_PORT})
+}
+
+listenerMailer &
+
+function openCanaryListener() {
+    echo "OpenCanary Listener => waiting new line..."
+    while read -r line; do
+      echo -e "${line}" | nc -N -q 0 127.0.0.1 ${OPEN_CANARY_MAILER_PORT}
+      echo "OpenCanary Listener => waiting new line..."
+    done < <(nc -k -l 127.0.0.1 ${OPEN_CANARY_LISTEN_PORT})
+}
+
+openCanaryListener &
+
+wait
 
 echo "main thread finished"
