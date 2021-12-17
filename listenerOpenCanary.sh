@@ -112,9 +112,9 @@ function replaceValues() {
 function sendMail() {
   #  echo "${LogTypes[${logType}]}"
   msg="${1}"
+#  msg=$(replaceValues "${1}")
   dangerLevel="${2}"
   #replace known values
-  msg=$(replaceValues "${msg}")
   #reformat columns to html
   jsonParsedLineTable=$(jq -r '(
                           map(
