@@ -118,7 +118,7 @@ function periodicCommit() {
   echo "periodic commit => sleeping"
   sleep 60s
   echo "periodic commit => sending"
-  echo 'COMMIT!;' | nc -N 127.0.0.1 1514
+  echo -e "COMMIT!;" | nc -N -q 0 127.0.0.1 1514
   echo "periodic commit => submitted"
   periodicCommit &
   exit 0
