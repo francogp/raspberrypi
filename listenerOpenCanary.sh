@@ -104,7 +104,7 @@ trap cleanup EXIT
 function periodicCommit() {
   while true; do
     sleep 60s
-    echo 'COMMIT!;' | nc -N localhost 1514
+    echo 'COMMIT!;' | nc -N 127.0.0.1 1514
     echo "periodic commit submitted"
   done
 }
@@ -240,7 +240,7 @@ while read -r line; do
       fi
     fi
   fi
-done < <(nc -k -l localhost 1514)
+done < <(nc -k -l 127.0.0.1 1514)
 
 echo "main thread finished"
 
@@ -248,7 +248,7 @@ echo "main thread finished"
 #kill -9 70894
 
 #test
-#echo '{"dst_host": "9.9.9.9", "dst_port": 21, "local_time": "2015-07-20 13:38:21.281259", "logdata": {"PASSWORD": "default", "USERNAME": "admin"}, "logtype": 1000, "node_id": "AlertTest","src_host": "8.8.8.8", "src_port": 49635}' | nc -v -q 1 localhost 1514
+#echo '{"dst_host": "9.9.9.9", "dst_port": 21, "local_time": "2015-07-20 13:38:21.281259", "logdata": {"PASSWORD": "default", "USERNAME": "admin"}, "logtype": 1000, "node_id": "AlertTest","src_host": "8.8.8.8", "src_port": 49635}' | nc -v -q 1 127.0.0.1 1514
 
 #sudo netstat -ltup | grep 1514
 #jq '.' <<<  '[{"dst_host": "9.9.9.9", "dst_port": 21, "local_time": "2015-07-20 13:38:21.281259", "logdata": {"PASSWORD": "default", "USERNAME": "admin"}, "logtype": 2000, "node_id": "AlertTest","src_host": "8.8.8.8", "src_port": 49635},{"dst_host": "8.9.9.8", "dst_port": 217, "local_time": "2015-07-20 13:39:27.59", "logdata": {"PASSWORD": "default4", "USERNAME": "admin2"}, "logtype": 2001, "node_id": "AlertTest","src_host": "8.4.8.4", "src_port": 496335}]'
