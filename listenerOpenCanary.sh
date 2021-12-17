@@ -179,8 +179,8 @@ counterLow=0
 msgDanger="["
 msgLow="["
 while read -r line; do
+  echo "${line}"
   if [ "$line" = "COMMIT!;" ]; then
-    echo "incoming commit"
     if [[ $counterDanger -gt 0 ]]; then
       msgDanger="${msgDanger::-1}]"
       # FORK function and continue
