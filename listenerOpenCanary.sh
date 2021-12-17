@@ -86,7 +86,6 @@ LogTypes=(
   ["99007"]="USER 7"
   ["99008"]="USER 8"
   ["99009"]="USER 9"
-
 )
 
 #kill all subprocess on exit
@@ -101,13 +100,62 @@ function commit() {
 
 commit &
 
+function replaceValues() {
+  output="${1}"
+  for i in "${!LogTypes[@]}"; do
+    # shellcheck disable=SC2001
+    output=$(sed -e "s/\([\"\']\)logtype[\"\']\\s*:\\s*${i}/\1logtype\1: \1${LogTypes[${i}]}\1/g" <<<"${output}")
+  done
+  echo "${output}"
+}
+
 function sendMail() {
   #  echo "${LogTypes[${logType}]}"
   msg="${1}"
   dangerLevel="${2}"
-  #  jsonParsedLine=$(jq . <<<"${msg}")
-  columns="Fecha\tTipo\tHost Origen\tPuerto Origen\tHost Destino\tPuerto Destino\tDispositivo\tDatos\n"
-  jsonParsedLineTable=$(jq -r '.[] | "\(.local_time)\t\(.logtype)\t\(.src_host)\t\(.src_port)\t\(.dst_host)\t\(.dst_port)\t\(.node_id)\t\(.logdata)"' <<<"${msg}")
+  #replace known values
+  msg=$(replaceValues "${msg}")
+  #reformat columns to html
+  jsonParsedLineTable=$(jq -r '(
+                          map(
+                              {
+                                local_time,
+                                logtype: (if .logtype == "" then "-" else .logtype end),
+                                src_host: (if .src_host == "" then "-" else .src_host end),
+                                src_port: (if .src_port == "" or .src_port == -1 then "-" else .src_port end),
+                                dst_host: (if .dst_host == "" then "-" else .dst_host end),
+                                dst_port: (if .dst_port == "" or .dst_port == -1 then "-" else .dst_port end),
+                                node_id: (if .node_id == "" then "-" else .node_id end),
+                                logdata: (if .logdata == "" then "-" else .logdata end)
+                              }
+                            )
+                          | .[]
+                          | "<tr>
+                            <td>\(.local_time | @html)</td><td>\(.logtype | @html)</td>
+                            <td>\(.src_host | @html)</td><td>\(.src_port | @html)</td>
+                            <td>\(.dst_host | @html)</td><td>\(.dst_port | @html)</td>
+                            <td>\(.node_id | @html)</td><td>\(.logdata | @html)</td>
+                        </tr>"
+                        )' <<<"${msg}")
+  output="
+<!DOCTYPE html>
+<html lang='es'>
+<head>
+  <style>
+  table, th, td {
+    border : 1px solid black;
+    border-collapse : collapse;
+    padding : 0.2rem;
+    text-align: left;
+  }
+  </style>
+  <title>Log</title>
+</head>
+<body>
+<table> <tr> <th>Fecha</th>    <th>Tipo</th>    <th>Host Origen</th>    <th>Puerto Origen</th>    <th>Host Destino</th>    <th>Puerto Destino</th>    <th>Dispositivo</th>    <th>Datos</th> </tr>
+${jsonParsedLineTable}
+</table>"
+
   if [[ "$dangerLevel" -eq 0 ]]; then
     dangerMsg="Baja Importancia"
     targetMail="${reportOpenCanaryLowDangerTo}"
@@ -115,12 +163,12 @@ function sendMail() {
     dangerMsg="Importante!"
     targetMail="${reportOpenCanaryDangerTo}"
   fi
-#  echo "DANGER LEVEL = ${dangerLevel}"
-#  echo "Original:"
-#  echo "${msg}"
-#  echo "Parsed:"
-#  echo "${columns}${jsonParsedLineTable}"
-  echo -e "${columns}${jsonParsedLineTable}" | sudo mutt -e "set content_type=text/plain" -s "OpenCanary: ${dangerMsg}" -- "${targetMail}"
+  #  echo "DANGER LEVEL = ${dangerLevel}"
+  #  echo "Original:"
+  #  echo "${msg}"
+  #  echo "Parsed:"
+  #  echo "${columns}${jsonParsedLineTable}"
+  echo -e "${output}" | sudo mutt -e "set content_type=text/html" -s "Honeypot: ${dangerMsg}" -- "${targetMail}"
 }
 
 counterDanger=0
@@ -129,15 +177,15 @@ msgDanger="["
 msgLow="["
 while read -r line; do
   if [ "$line" = "COMMIT!;" ]; then
-#    echo "committing!!!!!!!"
+    #    echo "committing!!!!!!!"
     if [[ $counterDanger -gt 0 ]]; then
       msgDanger="${msgDanger::-1}]"
       # FORK function and continue
       sendMail "${msgDanger}" "1" &
       msgDanger="["
       counterDanger=0
-#    else
-#      echo "ignoring danger commit"
+      #    else
+      #      echo "ignoring danger commit"
     fi
     if [[ $counterLow -gt 0 ]]; then
       msgLow="${msgLow::-1}]"
@@ -145,8 +193,8 @@ while read -r line; do
       sendMail "${msgLow}" "0" &
       msgLow="["
       counterLow=0
-#    else
-#      echo "ignoring low commit"
+      #    else
+      #      echo "ignoring low commit"
     fi
   else
     # ======= process line =======
