@@ -93,6 +93,7 @@ trap 'trap - SIGTERM && kill -- -$$' SIGINT SIGTERM EXIT
 
 function commit() {
   while true; do
+    echo "Sending email..."
     echo 'COMMIT!;' | nc -v -q 1 localhost 1514
     sleep 60s
   done
@@ -112,9 +113,10 @@ function replaceValues() {
 function sendMail() {
   #  echo "${LogTypes[${logType}]}"
   msg="${1}"
+  #replace known values
 #  msg=$(replaceValues "${1}")
   dangerLevel="${2}"
-  #replace known values
+  echo "Formatting email..."
   #reformat columns to html
   jsonParsedLineTable=$(jq -r '(
                           map(
@@ -168,6 +170,7 @@ ${jsonParsedLineTable}
   #  echo "${msg}"
   #  echo "Parsed:"
   #  echo "${columns}${jsonParsedLineTable}"
+  echo "Sending email..."
   echo -e "${output}" | sudo mutt -e "set content_type=text/html" -s "Honeypot: ${dangerMsg}" -- "${targetMail}"
 }
 
@@ -177,7 +180,7 @@ msgDanger="["
 msgLow="["
 while read -r line; do
   if [ "$line" = "COMMIT!;" ]; then
-    #    echo "committing!!!!!!!"
+    echo "incoming commit"
     if [[ $counterDanger -gt 0 ]]; then
       msgDanger="${msgDanger::-1}]"
       # FORK function and continue
