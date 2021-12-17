@@ -88,17 +88,28 @@ LogTypes=(
   ["99009"]="USER 9"
 )
 
-#kill all subprocess on exit
-trap 'trap - SIGTERM && kill -- -$$' SIGINT SIGTERM EXIT
+cleanup() {
+    # kill all processes whose parent is this process
+    pkill -P $$
+}
 
-function commit() {
+for sig in INT QUIT HUP TERM; do
+  trap "
+    cleanup
+    trap - $sig EXIT
+    kill -s $sig "'"$$"' "$sig"
+done
+trap cleanup EXIT
+
+function periodicCommit() {
   while true; do
-    echo 'COMMIT!;' | nc -v -N localhost 1514
     sleep 60s
+    echo 'COMMIT!;' | nc -N localhost 1514
+    echo "periodic commit submitted"
   done
 }
 
-commit &
+periodicCommit &
 
 function replaceValues() {
   output="${1}"
@@ -169,7 +180,6 @@ ${jsonParsedLineTable}
   #  echo "Parsed:"
   #  echo "${columns}${jsonParsedLineTable}"
   echo "Sending email..."
-  echo -e "hola" | sudo mutt -e "set content_type=text/txt" -s "Honeypot: ${dangerMsg}" -- "${targetMail}"
   echo -e "${output}" | sudo mutt -e "set content_type=text/html" -s "Honeypot: ${dangerMsg}" -- "${targetMail}"
   echo "Email sent"
 }
@@ -230,9 +240,12 @@ while read -r line; do
       fi
     fi
   fi
-done < <(nc -q -1 -k -l localhost 1514)
+done < <(nc -k -l localhost 1514)
 
 echo "main thread finished"
+
+#ps aux | grep 1514
+#kill -9 70894
 
 #test
 #echo '{"dst_host": "9.9.9.9", "dst_port": 21, "local_time": "2015-07-20 13:38:21.281259", "logdata": {"PASSWORD": "default", "USERNAME": "admin"}, "logtype": 1000, "node_id": "AlertTest","src_host": "8.8.8.8", "src_port": 49635}' | nc -v -q 1 localhost 1514
