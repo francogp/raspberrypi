@@ -89,8 +89,8 @@ LogTypes=(
 )
 
 cleanup() {
-    # kill all processes whose parent is this process
-    pkill -P $$
+  # kill all processes whose parent is this process
+  pkill -P $$
 }
 
 for sig in INT QUIT HUP TERM; do
@@ -102,11 +102,11 @@ done
 trap cleanup EXIT
 
 function periodicCommit() {
-  while true; do
-    sleep 60s
-    echo 'COMMIT!;' | nc -N 127.0.0.1 1514
-    echo "periodic commit submitted"
-  done
+  sleep 60s
+  echo 'COMMIT!;' | nc -N 127.0.0.1 1514
+  echo "periodic commit submitted"
+  periodicCommit &
+  exit 0
 }
 
 periodicCommit &
