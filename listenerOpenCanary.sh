@@ -3,6 +3,19 @@
 # Copyright (c) 2021. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
 #
 
+#sudo journalctl -u opencanarylistener -b
+
+#sudo git -C raspberrypi pull && sudo bash raspberrypi/updateOpenCanary.sh
+
+#ps aux | grep 1514
+#kill -9 70894
+
+#test
+#echo '{"dst_host": "9.9.9.9", "dst_port": 21, "local_time": "2015-07-20 13:38:21.281259", "logdata": {"PASSWORD": "default", "USERNAME": "admin"}, "logtype": 1000, "node_id": "AlertTest","src_host": "8.8.8.8", "src_port": 49635}' | nc -v -q 1 127.0.0.1 1514
+
+#sudo netstat -ltup | grep 1514
+#jq '.' <<<  '[{"dst_host": "9.9.9.9", "dst_port": 21, "local_time": "2015-07-20 13:38:21.281259", "logdata": {"PASSWORD": "default", "USERNAME": "admin"}, "logtype": 2000, "node_id": "AlertTest","src_host": "8.8.8.8", "src_port": 49635},{"dst_host": "8.9.9.8", "dst_port": 217, "local_time": "2015-07-20 13:39:27.59", "logdata": {"PASSWORD": "default4", "USERNAME": "admin2"}, "logtype": 2001, "node_id": "AlertTest","src_host": "8.4.8.4", "src_port": 496335}]'
+
 #sudo bash raspberrypi/listenerOpenCanary.sh
 
 # ======== START configs ========
@@ -190,6 +203,7 @@ counterDanger=0
 counterLow=0
 msgDanger="["
 msgLow="["
+echo "Listener => waiting new line..."
 while read -r line; do
   if [ "$line" = "COMMIT!;" ]; then
     echo "COMMIT => arrived"
@@ -243,15 +257,7 @@ while read -r line; do
       fi
     fi
   fi
+  echo "Listener => waiting new line..."
 done < <(nc -k -l 127.0.0.1 1514)
 
 echo "main thread finished"
-
-#ps aux | grep 1514
-#kill -9 70894
-
-#test
-#echo '{"dst_host": "9.9.9.9", "dst_port": 21, "local_time": "2015-07-20 13:38:21.281259", "logdata": {"PASSWORD": "default", "USERNAME": "admin"}, "logtype": 1000, "node_id": "AlertTest","src_host": "8.8.8.8", "src_port": 49635}' | nc -v -q 1 127.0.0.1 1514
-
-#sudo netstat -ltup | grep 1514
-#jq '.' <<<  '[{"dst_host": "9.9.9.9", "dst_port": 21, "local_time": "2015-07-20 13:38:21.281259", "logdata": {"PASSWORD": "default", "USERNAME": "admin"}, "logtype": 2000, "node_id": "AlertTest","src_host": "8.8.8.8", "src_port": 49635},{"dst_host": "8.9.9.8", "dst_port": 217, "local_time": "2015-07-20 13:39:27.59", "logdata": {"PASSWORD": "default4", "USERNAME": "admin2"}, "logtype": 2001, "node_id": "AlertTest","src_host": "8.4.8.4", "src_port": 496335}]'
