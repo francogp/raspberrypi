@@ -180,7 +180,7 @@ function sendMail() {
   <title>Log</title>
 </head>
 <body>
-<table> <tr> <th>Fecha</th>    <th>Tipo</th>    <th>Host Origen</th>    <th>Puerto Origen</th>    <th>Host Destino</th>    <th>Puerto Destino</th>    <th>Dispositivo</th>    <th>Datos</th> </tr>
+<table> <tr> <th>Fecha</th>    <th>Tipo</th>    <th>Ip Origen</th>    <th>Puerto Origen</th>    <th>Ip Destino</th>    <th>Puerto Destino</th>    <th>Dispositivo Atacado</th>    <th>Datos</th> </tr>
 ${jsonParsedLineTable}
 </table>"
 
