@@ -111,10 +111,9 @@ function replaceValues() {
 }
 
 function sendMail() {
-  #  echo "${LogTypes[${logType}]}"
-  msg="${1}"
+  #  msg="${1}"
   #replace known values
-#  msg=$(replaceValues "${1}")
+  msg=$(replaceValues "${1}")
   dangerLevel="${2}"
   echo "Formatting email..."
   #reformat columns to html
