@@ -103,8 +103,9 @@ trap cleanup EXIT
 
 function periodicCommit() {
   sleep 60s
-  echo 'COMMIT!;' | nc -N 127.0.0.1 1514
-  echo "periodic commit submitted"
+  echo "periodic commit: sending"
+  echo 'COMMIT!;' | nc -N -q 10 127.0.0.1 1514
+  echo "periodic commit: submitted"
   periodicCommit &
   exit 0
 }
