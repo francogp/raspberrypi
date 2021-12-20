@@ -148,7 +148,7 @@ function sendMail() {
   jsonParsedLineTable=$(jq -r '(
                           map(
                               {
-                                local_time,
+                                local_time,utc_time,local_time_adjusted,
                                 logtype: (if .logtype == "" then "-" else .logtype end),
                                 src_host: (if .src_host == "" then "-" else .src_host end),
                                 src_port: (if .src_port == "" or .src_port == -1 then "-" else .src_port end),
