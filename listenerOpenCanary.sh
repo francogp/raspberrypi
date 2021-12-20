@@ -140,6 +140,7 @@ function replaceValues() {
 function sendMail() {
   #  msg="${1}"
   echo "Email => Formatting ..."
+  echo "${msg}"
   #replace known values
   msg=$(replaceValues "${1}")
   dangerLevel="${2}"
@@ -159,10 +160,14 @@ function sendMail() {
                             )
                           | .[]
                           | "<tr>
-                            <td>\(.local_time | @html)</td><td>\(.logtype | @html)</td>
-                            <td>\(.src_host | @html)</td><td>\(.src_port | @html)</td>
-                            <td>\(.dst_host | @html)</td><td>\(.dst_port | @html)</td>
-                            <td>\(.node_id | @html)</td><td>\(.logdata | @html)</td>
+                            <td>\(.local_time | @html)<br>\(.utc_time | @html)<br>\(.local_time_adjusted | @html)<br></td>
+                            <td>\(.logtype | @html)</td>
+                            <td>\(.src_host | @html)</td>
+                            <td>\(.src_port | @html)</td>
+                            <td>\(.dst_host | @html)</td>
+                            <td>\(.dst_port | @html)</td>
+                            <td>\(.node_id | @html)</td>
+                            <td>\(.logdata | @html)</td>
                         </tr>"
                         )' <<<"${msg}")
   output="
