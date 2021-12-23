@@ -118,11 +118,11 @@ trap cleanup EXIT
 
 function periodicCommit() {
   while true; do
-    echo "periodic commit => sleeping"
+#    echo "periodic commit => sleeping"
     sleep 60s
-    echo "periodic commit => sending"
+#    echo "periodic commit => sending"
     echo -e "COMMIT!;" | nc -N -q 0 127.0.0.1 ${OPEN_CANARY_MAILER_PORT}
-    echo "periodic commit => submitted"
+#    echo "periodic commit => submitted"
   done
 }
 
@@ -150,6 +150,7 @@ function sendMail() {
                               {
                                 local_time_adjusted,
                                 logtype: (if .logtype == "" then "-" else .logtype end),
+                                proto: (if .logdata.PROTO == "" or .logdata.PROTO == null or .logdata.PROTO == "null" then "-" else .logdata.PROTO end),
                                 src_host: (if .src_host == "" then "-" else .src_host end),
                                 src_port: (if .src_port == "" or .src_port == -1 then "-" else .src_port end),
                                 dst_host: (if .dst_host == "" then "-" else .dst_host end),
@@ -162,6 +163,7 @@ function sendMail() {
                           | "<tr>
                             <td>\(.local_time_adjusted | @html)<br></td>
                             <td>\(.logtype | @html)</td>
+                            <td>\(.proto | @html)</td>
                             <td>\(.src_host | @html)</td>
                             <td>\(.src_port | @html)</td>
                             <td>\(.dst_host | @html)</td>
@@ -185,7 +187,7 @@ function sendMail() {
   <title>Log</title>
 </head>
 <body>
-<table> <tr> <th>Fecha</th>    <th>Tipo</th>    <th>Ip Origen</th>    <th>Puerto Origen</th>    <th>Ip Destino</th>    <th>Puerto Destino</th>    <th>Dispositivo Atacado</th>    <th>Datos</th> </tr>
+<table> <tr> <th>Fecha</th>    <th>Tipo</th>    <th>Protocolo</th>    <th>Ip Origen</th>    <th>Puerto Origen</th>    <th>Ip Destino</th>    <th>Puerto Destino</th>    <th>Dispositivo Atacado</th>    <th>Datos</th> </tr>
 ${jsonParsedLineTable}
 </table>"
 
