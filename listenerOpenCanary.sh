@@ -118,11 +118,11 @@ trap cleanup EXIT
 
 function periodicCommit() {
   while true; do
-#    echo "periodic commit => sleeping"
+    #    echo "periodic commit => sleeping"
     sleep 60s
-#    echo "periodic commit => sending"
+    #    echo "periodic commit => sending"
     echo -e "COMMIT!;" | nc -N -q 0 127.0.0.1 ${OPEN_CANARY_MAILER_PORT}
-#    echo "periodic commit => submitted"
+    #    echo "periodic commit => submitted"
   done
 }
 
@@ -146,32 +146,50 @@ function sendMail() {
   dangerLevel="${2}"
   #reformat columns to html
   jsonParsedLineTable=$(jq -r '(
-                          map(
-                              {
-                                local_time_adjusted,
-                                logtype: (if .logtype == "" then "-" else .logtype end),
-                                proto: (if .logdata.PROTO == "" or .logdata.PROTO == null or .logdata.PROTO == "null" then "-" else .logdata.PROTO end),
-                                src_host: (if .src_host == "" then "-" else .src_host end),
-                                src_port: (if .src_port == "" or .src_port == -1 then "-" else .src_port end),
-                                dst_host: (if .dst_host == "" then "-" else .dst_host end),
-                                dst_port: (if .dst_port == "" or .dst_port == -1 then "-" else .dst_port end),
-                                node_id: (if .node_id == "" then "-" else .node_id end),
-                                logdata: (if .logdata == "" then "-" else .logdata end)
-                              }
-                            )
-                          | .[]
-                          | "<tr>
-                            <td>\(.local_time_adjusted | @html)<br></td>
-                            <td>\(.logtype | @html)</td>
-                            <td>\(.proto | @html)</td>
-                            <td>\(.src_host | @html)</td>
-                            <td>\(.src_port | @html)</td>
-                            <td>\(.dst_host | @html)</td>
-                            <td>\(.dst_port | @html)</td>
-                            <td>\(.node_id | @html)</td>
-                            <td>\(.logdata | @html)</td>
-                        </tr>"
-                        )' <<<"${msg}")
+map(
+    {
+      local_time_adjusted,
+      logtype: (if .logtype == "" then "-" else .logtype end),
+      proto: (if .logdata.PROTO == "" or .logdata.PROTO == null or .logdata.PROTO == "null" then "-" else .logdata.PROTO end),
+      src_host: (if .src_host == "" then "-" else .src_host end),
+      src_port: (if .src_port == "" or .src_port == -1 then "-" else .src_port end),
+      dst_host: (if .dst_host == "" then "-" else .dst_host end),
+      dst_port: (if .dst_port == "" or .dst_port == -1 then "-" else .dst_port end),
+      node_id: (if .node_id == "" then "-" else .node_id end),
+      logdata: (if .logdata == "" then "-" else .logdata end)
+    }
+  )
+| .[]
+| "<tr>
+  <td>\(.local_time_adjusted | @html)<br></td>
+  <td>\(.logtype | @html)</td>
+  <td>\(.proto | @html)</td>
+  <td>\(.src_host | @html)</td>
+  <td>\(.src_port | @html)</td>
+  <td>\(.dst_host | @html)</td>
+  <td>\(.dst_port | @html)</td>
+  <td>\(.node_id | @html)</td>
+  <td>\(.logdata | @html)</td>
+</tr>"
+)' <<<"${msg}")
+  plainParsedLineTable=$(jq -r '(
+map(
+    {
+      local_time_adjusted,
+      logtype: (if .logtype == "" then "-" else .logtype end),
+      proto: (if .logdata.PROTO == "" or .logdata.PROTO == null or .logdata.PROTO == "null" then "-" else .logdata.PROTO end),
+      src_host: (if .src_host == "" then "-" else .src_host end),
+      src_port: (if .src_port == "" or .src_port == -1 then "-" else .src_port end),
+      dst_host: (if .dst_host == "" then "-" else .dst_host end),
+      dst_port: (if .dst_port == "" or .dst_port == -1 then "-" else .dst_port end),
+      node_id: (if .node_id == "" then "-" else .node_id end),
+      logdata: (if .logdata == "" then "-" else .logdata end)
+    }
+  )
+| .[]
+| "\(.local_time_adjusted | @html)\t\(.logtype | @html)\t\(.proto | @html)\t\(.src_host | @html)\t\(.src_port | @html)\t\(.dst_host | @html)\t\(.dst_port | @html)\t\(.node_id | @html)\t\(.logdata | @html)\t"
+)' <<<"${msg}")
+
   output="
 <!DOCTYPE html>
 <html lang='es'>
@@ -189,7 +207,9 @@ function sendMail() {
 <body>
 <table> <tr> <th>Fecha</th>    <th>Tipo</th>    <th>Protocolo</th>    <th>Ip Origen</th>    <th>Puerto Origen</th>    <th>Ip Destino</th>    <th>Puerto Destino</th>    <th>Dispositivo Atacado</th>    <th>Datos</th> </tr>
 ${jsonParsedLineTable}
-</table>"
+</table>
+</body>
+</html>"
 
   if [[ "$dangerLevel" -eq 0 ]]; then
     dangerMsg="Baja Importancia"
@@ -209,76 +229,76 @@ ${jsonParsedLineTable}
 }
 
 function listenerMailer() {
-    counterDanger=0
-    counterLow=0
-    msgDanger="["
-    msgLow="["
-    echo "Listener Mailer => waiting new line..."
-    while read -r line; do
-      if [ "$line" = "COMMIT!;" ]; then
-        echo "Listener Mailer: COMMIT => arrived"
-        if [[ $counterDanger -gt 0 ]]; then
-          msgDanger="${msgDanger::-1}]"
+  counterDanger=0
+  counterLow=0
+  msgDanger="["
+  msgLow="["
+  echo "Listener Mailer => waiting new line..."
+  while read -r line; do
+    if [ "$line" = "COMMIT!;" ]; then
+      echo "Listener Mailer: COMMIT => arrived"
+      if [[ $counterDanger -gt 0 ]]; then
+        msgDanger="${msgDanger::-1}]"
+        # FORK function and continue
+        sendMail "${msgDanger}" "1" &
+        msgDanger="["
+        counterDanger=0
+        #    else
+        #      echo "ignoring danger commit"
+      fi
+      if [[ $counterLow -gt 0 ]]; then
+        msgLow="${msgLow::-1}]"
+        # FORK function and continue
+        sendMail "${msgLow}" "0" &
+        msgLow="["
+        counterLow=0
+        #    else
+        #      echo "ignoring low commit"
+      fi
+    else
+      echo "Listener Mailer: MSG => ${line}"
+      # ======= process line =======
+      logType=$(jq '.logtype' <<<"${line}")
+      if [[ "$logType" -ge ${LOW_DANGER_MSG_GE_THAN} ]]; then
+        # ======= append to DANGER mail =========
+        msgDanger+="${line}"
+        counterDanger=$((counterDanger + 1))
+        if [[ "$counterDanger" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
+          msgDanger+="]"
           # FORK function and continue
           sendMail "${msgDanger}" "1" &
           msgDanger="["
           counterDanger=0
-          #    else
-          #      echo "ignoring danger commit"
+        else
+          msgDanger+=","
         fi
-        if [[ $counterLow -gt 0 ]]; then
-          msgLow="${msgLow::-1}]"
+      else
+        # ======= append to low mail =========
+        msgLow+="${line}"
+        counterLow=$((counterLow + 1))
+        if [[ "$counterLow" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
+          msgLow+="]"
           # FORK function and continue
           sendMail "${msgLow}" "0" &
           msgLow="["
           counterLow=0
-          #    else
-          #      echo "ignoring low commit"
-        fi
-      else
-        echo "Listener Mailer: MSG => ${line}"
-        # ======= process line =======
-        logType=$(jq '.logtype' <<<"${line}")
-        if [[ "$logType" -ge ${LOW_DANGER_MSG_GE_THAN} ]]; then
-          # ======= append to DANGER mail =========
-          msgDanger+="${line}"
-          counterDanger=$((counterDanger + 1))
-          if [[ "$counterDanger" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
-            msgDanger+="]"
-            # FORK function and continue
-            sendMail "${msgDanger}" "1" &
-            msgDanger="["
-            counterDanger=0
-          else
-            msgDanger+=","
-          fi
         else
-          # ======= append to low mail =========
-          msgLow+="${line}"
-          counterLow=$((counterLow + 1))
-          if [[ "$counterLow" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
-            msgLow+="]"
-            # FORK function and continue
-            sendMail "${msgLow}" "0" &
-            msgLow="["
-            counterLow=0
-          else
-            msgLow+=","
-          fi
+          msgLow+=","
         fi
       fi
-      echo "Listener Mailer => waiting new line..."
-    done < <(nc -k -l 127.0.0.1 ${OPEN_CANARY_MAILER_PORT})
+    fi
+    echo "Listener Mailer => waiting new line..."
+  done < <(nc -k -l 127.0.0.1 ${OPEN_CANARY_MAILER_PORT})
 }
 
 listenerMailer &
 
 function openCanaryListener() {
+  echo "OpenCanary Listener => waiting new line..."
+  while read -r line; do
+    echo -e "${line}" | nc -N -q 0 127.0.0.1 ${OPEN_CANARY_MAILER_PORT}
     echo "OpenCanary Listener => waiting new line..."
-    while read -r line; do
-      echo -e "${line}" | nc -N -q 0 127.0.0.1 ${OPEN_CANARY_MAILER_PORT}
-      echo "OpenCanary Listener => waiting new line..."
-    done < <(nc -k -l 127.0.0.1 ${OPEN_CANARY_LISTEN_PORT})
+  done < <(nc -k -l 127.0.0.1 ${OPEN_CANARY_LISTEN_PORT})
 }
 
 openCanaryListener &
