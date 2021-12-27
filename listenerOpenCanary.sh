@@ -172,23 +172,6 @@ map(
   <td>\(.logdata | @html)</td>
 </tr>"
 )' <<<"${msg}")
-  plainParsedLineTable=$(jq -r '(
-map(
-    {
-      local_time_adjusted,
-      logtype: (if .logtype == "" then "-" else .logtype end),
-      proto: (if .logdata.PROTO == "" or .logdata.PROTO == null or .logdata.PROTO == "null" then "-" else .logdata.PROTO end),
-      src_host: (if .src_host == "" then "-" else .src_host end),
-      src_port: (if .src_port == "" or .src_port == -1 then "-" else .src_port end),
-      dst_host: (if .dst_host == "" then "-" else .dst_host end),
-      dst_port: (if .dst_port == "" or .dst_port == -1 then "-" else .dst_port end),
-      node_id: (if .node_id == "" then "-" else .node_id end),
-      logdata: (if .logdata == "" then "-" else .logdata end)
-    }
-  )
-| .[]
-| "\(.local_time_adjusted | @html)\t\(.logtype | @html)\t\(.proto | @html)\t\(.src_host | @html)\t\(.src_port | @html)\t\(.dst_host | @html)\t\(.dst_port | @html)\t\(.node_id | @html)\t\(.logdata | @html)\t"
-)' <<<"${msg}")
 
   output="
 <!DOCTYPE html>
