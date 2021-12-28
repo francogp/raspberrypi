@@ -423,7 +423,22 @@ function computeLogStats() {
     done |
       sort -rn -k2)
 
-    output=$(echo -e "Origen Problemas\n${output}" | column -t)
+    # parsing first and last date
+    fist_date=""
+    line=$(head -n 1 <<<"${parsed}")
+    while IFS='~' read -r local_time_adjusted logtype proto src_host src_port dst_host dst_port dst_port_desc node_id logdata; do
+      fist_date="${local_time_adjusted}"
+    done <<<"${line}"
+
+    last_date=""
+    line=$(tail -n 1 <<<"${parsed}")
+    while IFS='~' read -r local_time_adjusted logtype proto src_host src_port dst_host dst_port dst_port_desc node_id logdata; do
+      last_date="${local_time_adjusted}"
+    done <<<"${line}"
+
+    output="Período: ${fist_date} hasta ${last_date}\n\n"
+    output+=$(echo -e "Origen Problemas\n${output}" | column -t)
+
     echo -e "${output}"
   else
     echo ""
@@ -468,7 +483,7 @@ map(
 </tr>"
 )' <<<"${msg}")
 
-stats=$(computeLogStats)
+  stats=$(computeLogStats)
 
   output="
 <!DOCTYPE html>
@@ -598,3 +613,9 @@ openCanaryListener &
 wait
 
 echo "main thread finished"
+
+#REMOVE FROM LOG AN IP
+# sudo systemctl stop opencanary.service
+# sudo \awk '!/192.168.0.120/' /var/tmp/opencanary.log > tmpfile && sudo \mv tmpfile /var/tmp/opencanary.log
+# sudo chown root:root /var/tmp/opencanary.log
+# sudo systemctl start opencanary.service
