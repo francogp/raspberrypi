@@ -490,7 +490,7 @@ ${jsonParsedLineTable}
 </table>
 <br>
 <hr>
-<p>Estadística actual de atacantes</p>
+<p>Estadística total de atacantes</p>
 <pre>
   <code>
 ${stats}
