@@ -487,6 +487,7 @@ stats=$(computeLogStats)
 <body>
 <table> <tr> <th>Fecha</th>  <th>Tipo</th>  <th>Protocolo</th>  <th>Host Origen</th>    <th>Puerto Origen</th>    <th>Host Destino</th>    <th>Puerto Destino</th>   <th>Posible Objetivo</th>   <th>Dispositivo Atacado</th>    <th>Datos</th> </tr>
 ${jsonParsedLineTable}
+</table>
 <br>
 <hr>
 <p>Estadística actual de atacantes</p>
@@ -495,7 +496,6 @@ ${jsonParsedLineTable}
 ${stats}
   </code>
 </pre>
-</table>
 </body>
 </html>"
 
