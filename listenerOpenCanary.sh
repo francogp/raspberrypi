@@ -400,11 +400,6 @@ function computeLogStats() {
     declare -A sourceIP
 
     while IFS= read -r line; do
-      #  array=(${line//~/ })
-      #  IFS='|' read -r local_time_adjusted logtype proto <<< "${line}"
-      #  output+="${local_time_adjusted},${proto},
-      #"
-
       while IFS='~' read -r local_time_adjusted logtype proto src_host src_port dst_host dst_port dst_port_desc node_id logdata; do
         if [[ ! -v "sourceIP['${src_host}']" ]]; then
           if [ "${logtype}" -ge 2000 ]; then
@@ -418,7 +413,7 @@ function computeLogStats() {
 
     done <<<"${parsed}"
 
-    output=$(for k in "${!sourceIP[@]}"; do
+    stats_parsed=$(for k in "${!sourceIP[@]}"; do
       echo $k ' ' ${sourceIP["${k}"]}
     done |
       sort -rn -k2)
@@ -437,7 +432,7 @@ function computeLogStats() {
     done <<<"${line}"
 
     output="Período: ${fist_date} hasta ${last_date}\n\n"
-    output+=$(echo -e "Origen Problemas\n${output}" | column -t)
+    output+=$(echo -e "Origen Problemas\n${stats_parsed}" | column -t)
 
     echo -e "${output}"
   else
