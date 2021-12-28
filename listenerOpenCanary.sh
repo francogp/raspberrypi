@@ -398,23 +398,37 @@ function computeLogStats() {
   )' <<<"${input}")
 
     declare -A sourceIP
+    declare -A protoCount
 
     while IFS= read -r line; do
       while IFS='~' read -r local_time_adjusted logtype proto src_host src_port dst_host dst_port dst_port_desc node_id logdata; do
+        # source attacker
         if [[ ! -v "sourceIP['${src_host}']" ]]; then
-          if [ "${logtype}" -ge 2000 ]; then
+          if [[ "${logtype}" -ge ${LOW_DANGER_MSG_GE_THAN} ]]; then
             sourceIP["${src_host}"]=1
           fi
         else
           sourceIP["${src_host}"]=$((sourceIP["${src_host}"] + 1))
         fi
-
+        # protocole count
+        if [[ ! -v "protoCount['${proto}']" ]]; then
+          if [ "${logtype}" -ge 2000 ]; then
+            protoCount["${proto}"]=0
+          fi
+        else
+          protoCount["${proto}"]=$((protoCount["${proto}"] + 1))
+        fi
       done <<<"${line}"
 
     done <<<"${parsed}"
 
-    stats_parsed=$(for k in "${!sourceIP[@]}"; do
+    source_stats_parsed=$(for k in "${!sourceIP[@]}"; do
       echo $k ' ' ${sourceIP["${k}"]}
+    done |
+      sort -rn -k2)
+
+    proto_stats_parsed=$(for k in "${!protoCount[@]}"; do
+      echo $k ' ' ${protoCount["${k}"]}
     done |
       sort -rn -k2)
 
@@ -432,7 +446,9 @@ function computeLogStats() {
     done <<<"${line}"
 
     output="Período: ${fist_date} hasta ${last_date}\n\n"
-    output+=$(echo -e "Origen Problemas\n${stats_parsed}" | column -t)
+    output+=$(echo -e "Origen Problemas\n${source_stats_parsed}" | column -t)
+    output+="\nProtocolo mas atacado:\n"
+    output+=$(echo -e "Protocolo Problemas\n${proto_stats_parsed}" | column -t)
 
     echo -e "${output}"
   else
