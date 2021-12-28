@@ -403,7 +403,7 @@ function computeLogStats() {
       while IFS='~' read -r local_time_adjusted logtype proto src_host src_port dst_host dst_port dst_port_desc node_id logdata; do
         if [[ ! -v "sourceIP['${src_host}']" ]]; then
           if [ "${logtype}" -ge 2000 ]; then
-            sourceIP["${src_host}"]=0
+            sourceIP["${src_host}"]=1
           fi
         else
           sourceIP["${src_host}"]=$((sourceIP["${src_host}"] + 1))
