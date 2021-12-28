@@ -363,10 +363,71 @@ function replaceValues() {
   final=""
 
   while IFS= read -r line; do
-      final+=$(replacePort "dst_port" "${line}")
-  done <<< "${output}"
+    final+=$(replacePort "dst_port" "${line}")
+  done <<<"${output}"
 
   echo -e "${final}"
+}
+
+function computeLogStats() {
+  if [ -f "/var/tmp/opencanary.log" ]; then
+
+    input="["
+    while IFS= read -r line; do
+      input+="${line},"
+    done <"/var/tmp/opencanary.log"
+    input="${input::-1}]"
+
+    parsed=$(jq -r '(
+  map(
+      {
+        local_time_adjusted,
+        logtype: (if .logtype == "" then "-" else .logtype end),
+        proto: (if .logdata.PROTO == "" or .logdata.PROTO == null or .logdata.PROTO == "null" then "-" else .logdata.PROTO end),
+        src_host: (if .src_host == "" then "-" else .src_host end),
+        src_port: (if .src_port == "" or .src_port == -1 then "-" else .src_port end),
+        dst_host: (if .dst_host == "" then "-" else .dst_host end),
+        dst_port: (if .dst_port == "" or .dst_port == -1 then "-" else .dst_port end),
+        dst_port_desc: (if .dst_port_desc == "" then "-" else .dst_port_desc end),
+        node_id: (if .node_id == "" then "-" else .node_id end),
+        logdata: (if .logdata == "" then "-" else .logdata end)
+      }
+    )
+  | .[]
+  | "\(.local_time_adjusted)~\(.logtype)~\(.proto)~\(.src_host)~\(.src_port)~\(.dst_host)~\(.dst_port)~\(.dst_port_desc)~\(.node_id)~\(.logdata)"
+  )' <<<"${input}")
+
+    declare -A sourceIP
+
+    while IFS= read -r line; do
+      #  array=(${line//~/ })
+      #  IFS='|' read -r local_time_adjusted logtype proto <<< "${line}"
+      #  output+="${local_time_adjusted},${proto},
+      #"
+
+      while IFS='~' read -r local_time_adjusted logtype proto src_host src_port dst_host dst_port dst_port_desc node_id logdata; do
+        if [[ ! -v "sourceIP['${src_host}']" ]]; then
+          if [ "${logtype}" -ge 2000 ]; then
+            sourceIP["${src_host}"]=0
+          fi
+        else
+          sourceIP["${src_host}"]=$((sourceIP["${src_host}"] + 1))
+        fi
+
+      done <<<"${line}"
+
+    done <<<"${parsed}"
+
+    output=$(for k in "${!sourceIP[@]}"; do
+      echo $k ' ' ${sourceIP["${k}"]}
+    done |
+      sort -rn -k2)
+
+    output=$(echo -e "Origen Problemas\n${output}" | column -t)
+    echo -e "${output}"
+  else
+    echo ""
+  fi
 }
 
 function sendMail() {
@@ -407,6 +468,8 @@ map(
 </tr>"
 )' <<<"${msg}")
 
+stats=$(computeLogStats)
+
   output="
 <!DOCTYPE html>
 <html lang='es'>
@@ -422,8 +485,16 @@ map(
   <title>Log</title>
 </head>
 <body>
-<table> <tr> <th>Fecha</th>    <th>Tipo</th>  <th>Protocolo</th>  <th>Host Origen</th>    <th>Puerto Origen</th>    <th>Host Destino</th>    <th>Puerto Destino</th>   <th>Posible Objetivo</th>   <th>Dispositivo</th>    <th>Datos</th> </tr>
+<table> <tr> <th>Fecha</th>  <th>Tipo</th>  <th>Protocolo</th>  <th>Host Origen</th>    <th>Puerto Origen</th>    <th>Host Destino</th>    <th>Puerto Destino</th>   <th>Posible Objetivo</th>   <th>Dispositivo Atacado</th>    <th>Datos</th> </tr>
 ${jsonParsedLineTable}
+<br>
+<hr>
+<p>Estadística actual de atacantes</p>
+<pre>
+  <code>
+${stats}
+  </code>
+</pre>
 </table>
 </body>
 </html>"
@@ -483,7 +554,7 @@ function listenerMailer() {
         counterDanger=$((counterDanger + 1))
         if [[ "$counterDanger" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
           msgDanger+="]"
-#          echo "${msgDanger}"
+          #          echo "${msgDanger}"
           # FORK function and continue
           sendMail "${msgDanger}" "1" &
           msgDanger="["
@@ -498,7 +569,7 @@ function listenerMailer() {
         counterLow=$((counterLow + 1))
         if [[ "$counterLow" -eq ${MSG_UNTIL_SEND_MAIL} ]]; then
           msgLow+="]"
-#          echo "${msgLow}"
+          #          echo "${msgLow}"
           # FORK function and continue
           sendMail "${msgLow}" "0" &
           msgLow="["
