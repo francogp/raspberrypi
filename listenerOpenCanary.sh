@@ -446,7 +446,7 @@ function computeLogStats() {
     done <<<"${line}"
 
     output="Período: ${fist_date} hasta ${last_date}\n"
-    output+="\nIp con mas problemas causados:\n\n"
+    output+="\nIp con más problemas causados:\n\n"
     output+=$(echo -e "Origen Problemas\n${source_stats_parsed}" | column -t)
     output+="\n\nPuerto más atacado:\n\n"
     output+=$(echo -e "Puerto Problemas\n${port_stats_parsed}" | column -t)
