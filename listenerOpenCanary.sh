@@ -413,7 +413,7 @@ function computeLogStats() {
         # port count
         if [[ ! -v "portCount['${dst_port}']" ]]; then
           if [ "${logtype}" -ge 2000 ]; then
-            portCount["${dst_port}"]=0
+            portCount["${dst_port}"]=1
           fi
         else
           portCount["${dst_port}"]=$((portCount["${dst_port}"] + 1))
