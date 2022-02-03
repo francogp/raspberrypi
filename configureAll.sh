@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2021. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
+# Copyright (c) 2022. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
 #
 configureAllScriptName="configureAll.sh"
 
@@ -36,7 +36,7 @@ if [ -z ${configureMailScriptName+x} ]; then
 fi
 
 if [ -z ${configureIpTableScriptName+x} ]; then
-  source "${SCRIPT_DIR}/configureIptable.sh"
+  source "${SCRIPT_DIR}/configureIpTable.sh"
 fi
 
 if [ -z ${configureSSHScriptName+x} ]; then
