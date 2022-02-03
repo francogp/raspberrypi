@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2021. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
+# Copyright (c) 2022. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
 #
 
 #sudo bash raspberrypi/setupOpenCanary.sh
@@ -64,6 +64,8 @@ cd /home/pi/OpenCanary || exit 100
 
 virtualenv env/
 . env/bin/activate
+
+sudo mkdir -p /etc/opencanaryd/
 
 # shellcheck disable=SC2016
 echo "
