@@ -52,9 +52,16 @@ else
   echo "reportOpenCanaryDangerTo is set to '${reportOpenCanaryDangerTo}'"
 fi
 
-
 declare -A KnownUsers
 KnownUsers=(
+  ["190.11.141.242"]="Router ITT"
+  ["190.11.141.248"]="developer.cevt.ar"
+  ["190.11.141.243"]="mail.cevt.ar"
+  ["190.11.141.244"]="web.cevt.ar"
+  ["190.11.141.245"]="net.cevt.ar"
+  ["190.11.141.246"]="itt.cevt.ar"
+  ["190.11.141.247"]="services.cevt.ar"
+  ["190.11.141.249"]="Wifi 7mo"
   ["192.168.0.1"]="Admin - 3 Piso - Sistemas - Router  MikroTik-750G y RB2011UiAS - Puerto Enlace a Internet"
   ["192.168.0.4"]="Admin - 3 Piso - Sistemas - Server UNIX Muleto"
   ["192.168.1.213"]="Admin - 3 Piso - Sistemas -Trilogic - Adrian"
@@ -738,6 +745,7 @@ function computeLogStats() {
     output+="\nIp con más problemas causados:\n\n"
     output+=$(echo -e "Origen\tProblemas\tDueño del IP\n${source_stats_parsed}" | column -ts $'\t')
     output+="\n\nPuerto más atacado:\n\n"
+    #TODO    add support for UDP
     output+=$(echo -e "Puerto\tProblemas\tDescripción\n${port_stats_parsed}" | column -ts $'\t')
 
     echo -e "${output}"
@@ -863,10 +871,33 @@ function listenerMailer() {
         #      echo "ignoring low commit"
       fi
     else
-      echo "Listener Mailer: MSG => ${line}"
+
       # ======= process line =======
       logType=$(jq '.logtype' <<<"${line}")
-      if [[ "$logType" -ge ${LOW_DANGER_MSG_GE_THAN} ]]; then
+      logPort=$(jq '.dst_port' <<<"${line}" | tr -d '"')
+      logProto=$(jq '.logdata.PROTO' <<<"${line}")
+
+      isLowPriority=0
+
+#      echo "Listener Mailer: PORT: $logPort"
+      #check if log must be low priority or not
+      if [[ ${logProto} == *"TCP"* ]]; then
+#        echo "Listener Mailer: TCP DETECTED"
+        if [[ $logPort != *"-1"* ]]; then
+#          echo "Listener Mailer: array = ${lowPriorityTCP[${logPort}]}"
+          if [[ -n "${lowPriorityTCP[${logPort}]}" ]]; then
+#            echo "Listener Mailer: LOW PRIORITY TCP"
+            isLowPriority=1
+          fi
+        fi
+      fi
+      if [[ "$logType" -lt "${LOW_DANGER_MSG_GE_THAN}" ]]; then
+        isLowPriority=1
+      fi
+
+      #analyze if send mail is needed
+      if [[ "$isLowPriority" -eq "0" ]]; then
+        echo "Listener Mailer: MSG (HIGH) => ${line}"
         # ======= append to DANGER mail =========
         msgDanger+="${line}
 "
@@ -882,6 +913,7 @@ function listenerMailer() {
           msgDanger+=","
         fi
       else
+        echo "Listener Mailer: MSG (LOW) => ${line}"
         # ======= append to low mail =========
         msgLow+="${line}
 "
