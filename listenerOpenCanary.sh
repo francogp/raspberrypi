@@ -717,7 +717,7 @@ function computeLogStats() {
       sort -t$'\t' -rn -k2)
 
     port_stats_parsed=$(for k in "${!portCount[@]}"; do
-      echo -e "$k\t${portCount["${k}"]}"
+      echo -e "$k\t${portCount["${k}"]}\t${PortTCP["${k}"]}"
     done |
       sort -t$'\t' -rn -k2)
 
@@ -738,7 +738,7 @@ function computeLogStats() {
     output+="\nIp con más problemas causados:\n\n"
     output+=$(echo -e "Origen\tProblemas\tDueño del IP\n${source_stats_parsed}" | column -ts $'\t')
     output+="\n\nPuerto más atacado:\n\n"
-    output+=$(echo -e "Puerto\tProblemas\n${port_stats_parsed}" | column -ts $'\t')
+    output+=$(echo -e "Puerto\tProblemas\tDescripción\n${port_stats_parsed}" | column -ts $'\t')
 
     echo -e "${output}"
   else
