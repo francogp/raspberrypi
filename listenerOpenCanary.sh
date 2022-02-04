@@ -949,9 +949,3 @@ openCanaryListener &
 wait
 
 echo "main thread finished"
-
-#REMOVE FROM LOG AN IP
-# sudo systemctl stop opencanary.service
-# sudo \awk '!/192.168.0.120/' /var/tmp/opencanary.log > tmpfile && sudo \mv tmpfile /var/tmp/opencanary.log
-# sudo chown root:root /var/tmp/opencanary.log
-# sudo systemctl start opencanary.service

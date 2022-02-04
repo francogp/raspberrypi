@@ -1,14 +1,15 @@
-# Raspberrypi configurations
+# Common commands
 
-Remember to
+## Clean lines from log
 
-```
-sudo chown root:root "${SCRIPT_DIR}/../raspberrypi" || exit 100
-sudo chmod 700 "${SCRIPT_DIR}/../raspberrypi" || exit 100
-```
-
-and then, for update
+example for source "src_host": "192.168.1.150"
 
 ```
-sudo git -C raspberrypi pull 
+sed -i '/\"src_host\"\: \"192.168.1.150\"/d' /var/tmp/opencanary.log
+```
+
+## updating program
+
+```
+sudo git -C raspberrypi pull && sudo bash raspberrypi/updateOpenCanary.sh
 ```
