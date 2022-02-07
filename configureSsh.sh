@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2021. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
+# Copyright (c) 2022. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
 #
 configureSSHScriptName="configureSSH.sh"
 
@@ -55,7 +55,8 @@ if [ "${ON}" = true ]; then
   sudo sed -i "s/^\#MaxAuthTries.*$/MaxAuthTries 6/g" "/etc/ssh/sshd_config"
   sudo sed -i "s/^\#MaxSessions.*$/MaxSessions 10/g" "/etc/ssh/sshd_config"
   sudo sed -i "s/^\#PubkeyAuthentication.*$/PubkeyAuthentication yes/g" "/etc/ssh/sshd_config"
-
+  sudo sed -i "s/^\#PasswordAuthentication.*$/PasswordAuthentication no/g" "/etc/ssh/sshd_config"
+  sudo sed -i "s/^\#PermitEmptyPasswords.*$/PermitEmptyPasswords no/g" "/etc/ssh/sshd_config"
   sudo sed -i "s/^ChallengeResponseAuthentication.*$/ChallengeResponseAuthentication no/g" "/etc/ssh/sshd_config"
   sudo sed -i "s/^#AuthorizedKeysFile.*$/AuthorizedKeysFile  \.ssh\/authorized_keys/g" "/etc/ssh/sshd_config"
 fi
@@ -65,6 +66,7 @@ if [ "${OFF}" = true ]; then
   sudo service ssh stop
   sudo sed -i "s/^\PermitRootLogin prohibit\-password$/#PermitRootLogin prohibit-password/g" "/etc/ssh/sshd_config"
   sudo sed -i "s/^\PasswordAuthentication.*$/#PasswordAuthentication no/g" "/etc/ssh/sshd_config"
+  sudo sed -i "s/^\PermitEmptyPasswords.*$/#PermitEmptyPasswords no/g" "/etc/ssh/sshd_config"
 fi
 
 sudo systemctl enable ssh.service
