@@ -36,16 +36,38 @@ else
   OFF=false
 fi
 
+if [[ "${flags[*]}" =~ "install" ]]; then
+  INSTALL=true
+else
+  INSTALL=false
+fi
+
 if [ "${ON}" = false ] && [ "${OFF}" = false ]; then
   echoInfo "optional parameters" "using DEFAULT ON"
   ON=true
 fi
 
+
 if [[ "${flags[*]}" =~ "help" ]]; then
-  echoInfo "optional parameters" "<on|off>"
+  echoInfo "optional parameters" "<on|off> <install>"
   exit 0
 fi
 
+#------------------------------------------------------------------
+if [ -d "/home/${USER}/.ssh/" ]; then
+  sudo chmod 700 "/home/${USER}/.ssh/"
+  #add to server.
+  eval $(ssh-agent -s)
+  if [ "${INSTALL}" = true ]; then
+    sudo chmod 644 "/home/${USER}/.ssh/id_rsa.pub"
+    sudo chmod 600 "/home/${USER}/.ssh/id_rsa"
+    ssh-add "/home/${USER}/.ssh/id_rsa"
+  fi
+else
+  echoError "ssh-add" "No /home/${USER}/.ssh/ folder."
+fi
+
+echoInfo "off" "turning off ssh"
 sudo systemctl stop ssh
 
 if [ "${ON}" = true ]; then
@@ -57,6 +79,7 @@ if [ "${ON}" = true ]; then
   sudo sed -i "s/^\#PubkeyAuthentication.*$/PubkeyAuthentication yes/g" "/etc/ssh/sshd_config"
   sudo sed -i "s/^\#PasswordAuthentication.*$/PasswordAuthentication no/g" "/etc/ssh/sshd_config"
   sudo sed -i "s/^\#PermitEmptyPasswords.*$/PermitEmptyPasswords no/g" "/etc/ssh/sshd_config"
+
   sudo sed -i "s/^ChallengeResponseAuthentication.*$/ChallengeResponseAuthentication no/g" "/etc/ssh/sshd_config"
   sudo sed -i "s/^#AuthorizedKeysFile.*$/AuthorizedKeysFile  \.ssh\/authorized_keys/g" "/etc/ssh/sshd_config"
 fi
