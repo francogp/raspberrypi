@@ -63,8 +63,6 @@ if [ -d "/home/${USER}/.ssh/" ]; then
     sudo chmod 600 "/home/${USER}/.ssh/id_rsa"
     ssh-add "/home/${USER}/.ssh/id_rsa"
   fi
-else
-  echoError "ssh-add" "No /home/${USER}/.ssh/ folder."
 fi
 
 echoInfo "off" "turning off ssh"
