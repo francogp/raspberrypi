@@ -55,10 +55,10 @@ fi
 
 #------------------------------------------------------------------
 if [ -d "/home/${USER}/.ssh/" ]; then
-  sudo chmod 700 "/home/${USER}/.ssh/"
   #add to server.
   eval $(ssh-agent -s)
   if [ "${INSTALL}" = true ]; then
+    sudo chmod 700 "/home/${USER}/.ssh/"
     sudo chmod 644 "/home/${USER}/.ssh/id_rsa.pub"
     sudo chmod 600 "/home/${USER}/.ssh/id_rsa"
     ssh-add "/home/${USER}/.ssh/id_rsa"
