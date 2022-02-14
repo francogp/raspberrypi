@@ -550,6 +550,7 @@ PortTCP=(
   ["27017"]="Utilizado por Percona Monitoring Management para recabar métricas de MongoDB."
   ["42004"]="Utilizado por Percona Monitoring Management para recabar métricas de ProxySQL."
   ["45003"]="Calivent herramienta de administración remota SSH con análisis de paquetes."
+  ["60666"]="SSH personalizado."
 )
 
 PortUDP=(
