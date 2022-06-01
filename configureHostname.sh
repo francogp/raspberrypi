@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2021. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
+# Copyright (c) 2022. Cooperativa Eléctrica de Venado Tuerto. Autor: Pellegrini Franco Gastón
 #
 configureHostnameScriptName="configureHostname.sh"
 
@@ -30,6 +30,7 @@ else
   echoInfo "configs.sh" "var deviceHostname is set to '${deviceHostname}'"
 fi
 
+#FIXME does not work if its not a fresh boot! change to detect other names
 echoInfo "/etc/hostname" "editing.."
 sudo sed -i "s/^raspberr[iy]\(pi\)*$/${deviceHostname}/g" "/etc/hostname"
 
