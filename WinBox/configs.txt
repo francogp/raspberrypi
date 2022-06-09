@@ -1,0 +1,47 @@
+sudo nano /etc/dhcpcd.conf   
+
+denyinterfaces eth0
+noipv6
+
+#profile static_wlan0
+interface wlan0
+static ip_address=192.168.88.62/24
+static routers=192.168.88.1
+static domain_name_servers=192.168.0.1 8.8.8.8 8.8.4.4
+
+sudo nano  /etc/network/interfaces.d/eth0-administrativo 
+
+auto eth0
+allow-hotplug eth0
+iface eth0 inet static
+   address 192.168.0.232
+   netmask 255.255.255.0
+   gateway 192.168.0.1
+   dns-nameservers 192.168.0.1 8.8.8.8 8.8.4.4
+
+auto eth0:1
+allow-hotplug eth0:1
+iface eth0:1 inet static
+   address 192.168.1.232
+   netmask 255.255.255.0
+
+////////////////////////////////////////////////////
+
+lxappearance
+
+////////////////////////////////////////////////////
+box64 emulator
+
+for PI4
+Warning, you need a 64bit OS:
+
+git clone https://github.com/ptitSeb/box64
+cd box64
+mkdir build; cd build; cmake .. -DRPI4ARM64=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo
+make -j4
+sudo make install
+If it's the first install, you also need:
+
+sudo systemctl restart systemd-binfmt
+
+sudo apt install wine64

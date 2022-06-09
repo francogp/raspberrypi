@@ -344,8 +344,10 @@ KnownUsers=(
   ["192.168.1.161"]="Admin - 7 Piso - Sistemas IT - SWITCH - Sistemas-it  - CEVT-000544 - MikroTik CSS610-8G-2S+IN"
   ["192.168.1.162"]="Admin - 3 Piso - Sistemas - SWITCH - DataCenter-01 - CEVT-000545 - MikroTik CSS326-24G-2S+RM"
   ["192.168.1.163"]="Admin - 3 Piso - Sistemas - SWITCH - DataCenter-01 - CEVT-000546 - MikroTik CSS326-24G-2S+RM"
-  ["192.168.0.253"]="Admin - 7 Piso - Sistemas IT - Franco Pellegrini - Raspberry Pi 400 - ( LabSoft-IT )"
-  ["192.168.1.253"]="Admin - 7 Piso - Sistemas IT - Franco Pellegrini - Raspberry Pi 400 - ( LabSoft-IT )"
+  ["192.168.0.232"]="Admin - 7 Piso - Sistemas IT - Monitoreo"
+  ["192.168.1.232"]="Admin - 7 Piso - Sistemas IT - Monitoreo"
+  ["192.168.0.253"]="Admin - 7 Piso - Sistemas IT - Franco Pellegrini - Raspberry Pi 400 - Honeypot"
+  ["192.168.1.253"]="Admin - 7 Piso - Sistemas IT - Franco Pellegrini - Raspberry Pi 400 - Honeypot"
 )
 
 declare -A LogTypes
