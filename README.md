@@ -11,5 +11,5 @@ sed -i '/\"src_host\"\: \"192.168.1.150\"/d' /var/tmp/opencanary.log
 ## updating program
 
 ```
-sudo git -C raspberrypi pull && sudo bash raspberrypi/updateOpenCanary.sh
+sudo git -C raspberrypi pull && sudo bash raspberrypi/update.sh
 ```
