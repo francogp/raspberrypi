@@ -60,8 +60,14 @@ KnownUsers=(
   ["190.11.141.244"]="web.cevt.ar"
   ["190.11.141.245"]="net.cevt.ar"
   ["190.11.141.246"]="itt.cevt.ar"
-  ["190.11.141.247"]="services.cevt.ar"
   ["190.11.141.249"]="Wifi 7mo"
+  ["181.98.22.146"]="Router ITT"
+  ["181.98.22.147"]="developer.cevt.ar"
+  ["181.98.22.148"]="mail.cevt.ar"
+  ["181.98.22.149"]="web.cevt.ar"
+  ["181.98.22.150"]="net.cevt.ar"
+  ["181.98.22.151"]="itt.cevt.ar"
+  ["181.98.22.153"]="Wifi 7mo"
   ["192.168.0.141"]="ADMIN - -1 - Mantenimiento - Damian Miscoff - PC - CEVT-000214 - CPU-204"
   ["192.168.1.141"]="ADMIN - -1 - Mantenimiento - Damian Miscoff - PC - CEVT-000214 - CPU-204"
   ["192.168.1.151"]="ADMIN - 0 - Atencion a Usuarios - Candida Medina - IMPRESORA - HP M404 - CEVT-000047"
@@ -890,14 +896,14 @@ function listenerMailer() {
 
       isLowPriority=0
 
-#      echo "Listener Mailer: PORT: $logPort"
+      #      echo "Listener Mailer: PORT: $logPort"
       #check if log must be low priority or not
       if [[ ${logProto} == *"TCP"* ]]; then
-#        echo "Listener Mailer: TCP DETECTED"
+        #        echo "Listener Mailer: TCP DETECTED"
         if [[ $logPort != *"-1"* ]]; then
-#          echo "Listener Mailer: array = ${lowPriorityTCP[${logPort}]}"
+          #          echo "Listener Mailer: array = ${lowPriorityTCP[${logPort}]}"
           if [[ -n "${lowPriorityTCP[${logPort}]}" ]]; then
-#            echo "Listener Mailer: LOW PRIORITY TCP"
+            #            echo "Listener Mailer: LOW PRIORITY TCP"
             isLowPriority=1
           fi
         fi
